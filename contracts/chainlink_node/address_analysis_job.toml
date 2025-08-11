@@ -1,0 +1,50 @@
+type = "directrequest"
+schemaVersion = 1
+name = "Address Analysis Job"
+maxTaskDuration = "0s"
+contractAddress = "0x8BA4C2A6569173942A93750Cc2a1022f70d6252E"
+minIncomingConfirmations = 0
+
+observationSource = """
+    decode_log   [type="ethabidecodelog"
+                  abi="OracleRequest(bytes32 indexed specId, address requester, bytes32 requestId, uint256 payment, address callbackAddr, bytes4 callbackFunctionId, uint256 cancelExpiration, uint256 dataVersion, bytes data)"
+                  data="$(jobRun.logData)"
+                  topics="$(jobRun.logTopics)"]
+
+    decode_cbor  [type="cborparse" data="$(decode_log.data)"]
+    
+    fetch        [type="http" 
+                  method=GET 
+                  url="$(decode_cbor.apiUrl)/$(decode_cbor.address)" 
+                  allowUnrestrictedNetworkAccess="true"]
+    
+    parse        [type="jsonparse" 
+                  path="response" 
+                  data="$(fetch)"]
+    
+    parse_category [type="jsonparse" 
+                   path="category" 
+                   data="$(parse)"]
+    
+    parse_explanation [type="jsonparse" 
+                      path="explanation" 
+                      data="$(parse)"]
+    
+    encode_data  [type="ethabiencode" 
+                  abi="(bytes32 requestId, uint256 category, string explanation)" 
+                  data="{ \\"requestId\\": $(decode_log.requestId), \\"category\\": $(parse_category), \\"explanation\\": $(parse_explanation) }"]
+    
+    encode_tx    [type="ethabiencode"
+                  abi="fulfillOracleRequest2(bytes32 requestId, uint256 payment, address callbackAddress, bytes4 callbackFunctionId, uint256 expiration, bytes calldata data)"
+                  data="{\\"requestId\\": $(decode_log.requestId), \\"payment\\": $(decode_log.payment), \\"callbackAddress\\": $(decode_log.callbackAddr), \\"callbackFunctionId\\": $(decode_log.callbackFunctionId), \\"expiration\\": $(decode_log.cancelExpiration), \\"data\\": $(encode_data)}"]
+    
+    submit_tx    [type="ethtx" 
+                  to="0x8BA4C2A6569173942A93750Cc2a1022f70d6252E" 
+                  data="$(encode_tx)"]
+
+    decode_log -> decode_cbor -> fetch -> parse -> parse_category
+    parse -> parse_explanation
+    parse_category -> encode_data
+    parse_explanation -> encode_data
+    encode_data -> encode_tx -> submit_tx
+"""
