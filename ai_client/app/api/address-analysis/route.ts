@@ -12,9 +12,10 @@ if (!apiKey) {
 
 const ai = new GoogleGenAI({ apiKey });
 
-export async function POST(request: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
-    const { address } = await request.json();
+    const { searchParams } = new URL(request.url);
+    const address = searchParams.get('address');
 
     if (!address) {
       return NextResponse.json(
@@ -70,6 +71,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       { error: "Failed to analyze address" },
       { status: 500 }
-    );
+      );
   }
 }

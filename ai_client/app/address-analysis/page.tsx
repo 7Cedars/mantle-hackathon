@@ -31,12 +31,8 @@ export default function AddressAnalysis() {
     setAnalysisResult(null);
 
     try {
-      const response = await fetch('/api/address-analysis', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ address }),
+      const response = await fetch(`/api/address-analysis?address=${encodeURIComponent(address)}`, {
+        method: 'GET',
       });
 
       if (!response.ok) {

@@ -39,8 +39,14 @@ export const categories = [
       description: 'Address doesn\'t clearly fit into the above categories'
     },
     {
-    id: 8,
-    title: 'Empty',
-    description: 'Did not observe any activity on the network for this address'
-    }
+      id: 8,
+      title: 'Contract',
+      description: 'Address is a contract, not an Externally Owned Account (EOA)'
+    },
+    {
+      id: 9,
+      title: 'Empty',
+      description: 'Did not observe any activity on the network for this address'
+    },
+
   ];
