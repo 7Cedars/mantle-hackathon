@@ -70,10 +70,6 @@ export default function Home() {
 
   return (
     <div className="chat-container">
-      <h1 style={{ textAlign: 'center', marginBottom: '20px' }}>
-        Gemini Chat App
-      </h1>
-      
       <div className="chat-messages">
         {messages.map((message) => (
           <div

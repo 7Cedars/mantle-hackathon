@@ -1,12 +1,13 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
+import Navigation from './components/Navigation'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Gemini Chat App',
-  description: 'A simple chat interface for Gemini 2.5 Pro',
+  title: 'Gemini & Alchemy Chat App',
+  description: 'A simple chat interface to test prompts for Gemini & Alchemy',
 }
 
 export default function RootLayout({
@@ -16,7 +17,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <Navigation />
+        <main className="main-content">
+          {children}
+        </main>
+      </body>
     </html>
   )
 }
