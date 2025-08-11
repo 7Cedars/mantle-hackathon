@@ -37,5 +37,10 @@ export const categories = [
       id: 7,
       title: 'Other',
       description: 'Address doesn\'t clearly fit into the above categories'
+    },
+    {
+    id: 8,
+    title: 'Empty',
+    description: 'Did not observe any activity on the network for this address'
     }
   ];
