@@ -1,3 +1,0 @@
-# Subscription.sol
-
-🚧 **Coming soon.** 🚧

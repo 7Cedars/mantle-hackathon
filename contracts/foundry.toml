@@ -13,7 +13,8 @@ remappings = [
     "@powers-script/=lib/powers/solidity/script/",
     "@forge-std/=lib/forge-std/src/",
     "@solady/=lib/solady/src/",
-    "@solbase/=lib/solbase/src/"
+    "@solbase/=lib/solbase/src/",
+    "@chainlink/contracts/=lib/chainlink/contracts/"
 ]
 
 # Compiler settings

@@ -20,6 +20,7 @@ help:
 	@echo "  verify         - Verify contracts on Etherscan"
 	@echo "  update-deps    - Update dependencies"
 	@echo "  install-deps   - Install dependencies"
+	@echo "  reset-deps     - Reset dependencies"
 
 # Build commands
 build:
@@ -120,7 +121,18 @@ update-deps:
 
 install-deps:
 	@echo "Installing dependencies..."
-	forge install
+	forge install foundry-rs/forge-std@v1.9.1 --no-git && \
+	forge install openzeppelin/openzeppelin-contracts@v5.0.2 --no-git && \
+	forge install smartcontractkit/chainlink@v2.7.0 --no-git
+# forge install smartcontractkit/foundry-chainlink-toolkit --no-git
+# forge install Hats-Protocol/hats-protocol@v1.0 --no-commit
+
+reset-deps:
+	@echo "Resetting dependencies..."
+	rm -rf lib/
+	forge install foundry-rs/forge-std@v1.9.1 --no-git && \
+	forge install openzeppelin/openzeppelin-contracts@v5.0.2 --no-git && \
+	forge install smartcontractkit/chainlink@v2.7.0 --no-git
 
 # Documentation
 doc:
