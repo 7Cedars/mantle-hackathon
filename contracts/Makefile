@@ -1,6 +1,9 @@
 # Makefile for Mantle Hackathon Solidity Project
 # Standard commands for Foundry-based development
 
+# 
+-include .env
+
 .PHONY: help build test test-verbose test-fuzz test-invariant coverage lint clean deploy-anvil deploy-sepolia deploy-mantle verify update-deps install-deps
 
 # Default target
@@ -88,10 +91,6 @@ anvil:
 	@echo "Starting Anvil local chain..."
 	anvil
 
-anvil-fork:
-	@echo "Starting Anvil with mainnet fork..."
-	anvil --fork-url $(MAINNET_RPC_URL)
-
 # Deployment commands
 deploy-anvil:
 	@echo "Deploying to local Anvil chain..."
@@ -123,16 +122,17 @@ install-deps:
 	@echo "Installing dependencies..."
 	forge install foundry-rs/forge-std@v1.9.1 --no-git && \
 	forge install openzeppelin/openzeppelin-contracts@v5.0.2 --no-git && \
-	forge install smartcontractkit/chainlink@v2.7.0 --no-git
-# forge install smartcontractkit/foundry-chainlink-toolkit --no-git
-# forge install Hats-Protocol/hats-protocol@v1.0 --no-commit
+	forge install smartcontractkit/chainlink-evm@contracts-v1.4.0 && \
+	forge install smartcontractkit/chainlink-ccip@contracts-ccip-v1.6.0
+
 
 reset-deps:
 	@echo "Resetting dependencies..."
 	rm -rf lib/
 	forge install foundry-rs/forge-std@v1.9.1 --no-git && \
 	forge install openzeppelin/openzeppelin-contracts@v5.0.2 --no-git && \
-	forge install smartcontractkit/chainlink@v2.7.0 --no-git
+	forge install smartcontractkit/chainlink-evm@contracts-v1.4.0 && \
+	forge install smartcontractkit/chainlink-ccip@contracts-ccip-v1.6.0
 
 # Documentation
 doc:
@@ -271,3 +271,12 @@ info:
 	@echo ""
 	@echo "Available tests:"
 	@find test/ -name "*.t.sol" -type f 2>/dev/null || echo "No tests found in test/" 
+
+
+SEPOLIA_DEPLOY_ARGS := --rpc-url $(SEPOLIA_RPC_URL) --account dev_3 --sender ${DEV2_ADDRESS} --broadcast --etherscan-api-key $(ETHERSCAN_API_KEY) --verifier etherscan --chain 11155111 --verify -vvvv
+MANTLE_SEPOLIA_DEPLOY_ARGS := --rpc-url $(MANTLE_SEPOLIA_RPC_URL) --account dev_3 --sender ${DEV2_ADDRESS} --broadcast --etherscan-api-key $(ETHERSCAN_API_KEY) --verifier etherscan --chain 5003 --verify -vvvv
+
+sepoliaDeployAiProxy :; forge script script/Deploy.s.sol:DeployScript $(SEPOLIA_DEPLOY_ARGS)
+sepoliaDeployCcipReceiveSend :; forge script script/DeployCcipReceiveSend.sol:DeployCcipReceiveSend $(SEPOLIA_DEPLOY_ARGS)
+
+mantleSepoliaDeployCcipSendReceive :; forge script script/DeployCcipSendReceive.sol:DeployCcipSendReceive $(MANTLE_SEPOLIA_DEPLOY_ARGS)

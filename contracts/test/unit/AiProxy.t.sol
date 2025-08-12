@@ -8,10 +8,7 @@ pragma solidity ^0.8.26;
 
 import {Test, console} from "forge-std/Test.sol";
 import {AiProxy} from "../../src/AiProxy.sol";
-import {MockLinkToken} from "../../lib/chainlink/contracts/src/v0.8/mocks/MockLinkToken.sol";
-// import {Operator} from "../../lib/chainlink/contracts/src/v0.8/operatorforwarder/dev/Operator.sol";
-// import {ConfirmedOwner} from "../../lib/chainlink/contracts/src/v0.8/shared/access/ConfirmedOwner.sol";
-// import {LinkTokenInterface} from "../../lib/chainlink/contracts/src/v0.8/shared/interfaces/LinkTokenInterface.sol";
+import {MockLinkToken} from "../../lib/chainlink-evm/contracts/src/v0.8/functions/tests/v1_X/testhelpers/MockLinkToken.sol";
 
 /**
  * @title MockOracle

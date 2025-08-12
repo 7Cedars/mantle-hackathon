@@ -4,7 +4,7 @@ type = "directrequest"
 # evmChainID for Sepolia Testnet
 evmChainID = "11155111"
 contractAddress = "0x8BA4C2A6569173942A93750Cc2a1022f70d6252E"
-maxTaskDuration = "0s"
+maxTaskDuration = "120s"
 minIncomingConfirmations = 0
 
 observationSource = """
@@ -17,7 +17,7 @@ observationSource = """
     
     fetch        [type="http" 
                   method=GET 
-                  url="$(decode_cbor.apiUrl)/$(decode_cbor.address)" 
+                  url="$(decode_cbor.apiUrl)" 
                   allowUnrestrictedNetworkAccess="true"]
     
     parse        [type="jsonparse" 

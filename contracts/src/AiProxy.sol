@@ -1,9 +1,17 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.7;
 
-import {Chainlink, ChainlinkClient} from "@chainlink/contracts/src/v0.8/ChainlinkClient.sol";
+import {Chainlink, ChainlinkClient} from "@chainlink/contracts/src/v0.8/operatorforwarder/ChainlinkClient.sol";
 import {ConfirmedOwner} from "@chainlink/contracts/src/v0.8/shared/access/ConfirmedOwner.sol";
 import {LinkTokenInterface} from "@chainlink/contracts/src/v0.8/shared/interfaces/LinkTokenInterface.sol";
+
+
+// import {Client} from "@chainlink/contracts-ccip/libraries/Client.sol";
+// import {CCIPReceiver} from "@chainlink/contracts-ccip/applications/CCIPReceiver.sol";
+// import {IRouterClient} from "@chainlink/contracts-ccip/interfaces/IRouterClient.sol";
+// import {LinkTokenInterface} from "@chainlink/contracts/src/v0.8/shared/interfaces/LinkTokenInterface.sol";
+// import {OwnerIsCreator} from "@chainlink/contracts/src/v0.8/shared/access/OwnerIsCreator.sol";
+
 
 // import {console2} from "forge-std/Test.sol";
 
@@ -63,7 +71,7 @@ contract AiProxy is ChainlinkClient, ConfirmedOwner {
     constructor(address owner_) ConfirmedOwner(owner_) {
         _setChainlinkToken(0x779877A7B0D9E8603169DdbD7836e478b4624789);
         _setChainlinkOracle(0x8BA4C2A6569173942A93750Cc2a1022f70d6252E);
-        jobId = "YOUR_JOB_ID_HERE"; // Replace with your actual job ID
+        jobId = "4a6637dbf5ec485f92de9837149a97b0"; 
         apiUrl = "https://ai-leviathan.vercel.app/api/address-analysis?address=";
     }
 
@@ -81,8 +89,8 @@ contract AiProxy is ChainlinkClient, ConfirmedOwner {
         );
         
         // Add the API URL and address as CBOR data
-        req._add("apiUrl", apiUrl);
-        req._add("address", _addressToString(targetAddress));
+        req._add("apiUrl", string.concat(apiUrl, _addressToString(targetAddress)));
+        // req._add("address", _addressToString(targetAddress));
         
         // Store the pending request
         bytes32 requestId = _sendChainlinkRequest(req, ORACLE_PAYMENT);
