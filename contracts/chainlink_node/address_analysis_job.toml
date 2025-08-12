@@ -1,8 +1,10 @@
-type = "directrequest"
+name = "Address > uint256, string (TOML)"
 schemaVersion = 1
-name = "Address Analysis Job"
-maxTaskDuration = "0s"
+type = "directrequest"
+# evmChainID for Sepolia Testnet
+evmChainID = "11155111"
 contractAddress = "0x8BA4C2A6569173942A93750Cc2a1022f70d6252E"
+maxTaskDuration = "0s"
 minIncomingConfirmations = 0
 
 observationSource = """

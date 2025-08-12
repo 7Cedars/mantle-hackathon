@@ -1,12 +1,17 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.26;
 
+//////////////////////////////////////////////////////////////////////
+//                         AI generated tests.                      // 
+//  for now, they pretty much all fail. Can get back to it later.   //
+//////////////////////////////////////////////////////////////////////
+
 import {Test, console} from "forge-std/Test.sol";
 import {AiProxy} from "../../src/AiProxy.sol";
 import {MockLinkToken} from "../../lib/chainlink/contracts/src/v0.8/mocks/MockLinkToken.sol";
 // import {Operator} from "../../lib/chainlink/contracts/src/v0.8/operatorforwarder/dev/Operator.sol";
-import {ConfirmedOwner} from "../../lib/chainlink/contracts/src/v0.8/shared/access/ConfirmedOwner.sol";
-import {LinkTokenInterface} from "../../lib/chainlink/contracts/src/v0.8/shared/interfaces/LinkTokenInterface.sol";
+// import {ConfirmedOwner} from "../../lib/chainlink/contracts/src/v0.8/shared/access/ConfirmedOwner.sol";
+// import {LinkTokenInterface} from "../../lib/chainlink/contracts/src/v0.8/shared/interfaces/LinkTokenInterface.sol";
 
 /**
  * @title MockOracle
@@ -45,7 +50,7 @@ contract AiProxyTest is Test {
     MockOracle public mockOracle;
     
     // Test addresses
-    address public owner = makeAddr("owner");
+    address public ownerProxy = makeAddr("ownerProxy");
     address public alice = makeAddr("alice");
     address public bob = makeAddr("bob");
     address public charlie = makeAddr("charlie");
@@ -63,16 +68,21 @@ contract AiProxyTest is Test {
     function setUp() public {
         // Deploy mock contracts
         mockLinkToken = new MockLinkToken();
-        mockOracle = new MockOracle(address(mockLinkToken), owner);
+        mockOracle = new MockOracle(address(mockLinkToken), ownerProxy);
+        
         
         // Deploy AiProxy with mock addresses
-        vm.prank(owner);
-        aiProxy = new AiProxy();
+        aiProxy = new AiProxy(ownerProxy);
+
+        address testOwner = aiProxy.owner(); // this is the owner of the AiProxy contract
+        assertEq(testOwner, ownerProxy, "Owner should be set correctly");
         
         // Set up the contract with mock addresses
+        vm.startPrank(ownerProxy);
         aiProxy.setOracle(address(mockOracle));
         aiProxy.setJobId(JOB_ID);
-        
+        vm.stopPrank();
+
         // Fund the AiProxy contract with LINK tokens
         mockLinkToken.transfer(address(aiProxy), 1000 ether);
         
@@ -80,7 +90,7 @@ contract AiProxyTest is Test {
         vm.label(address(aiProxy), "AiProxy");
         vm.label(address(mockLinkToken), "MockLinkToken");
         vm.label(address(mockOracle), "MockOracle");
-        vm.label(owner, "Owner");
+        vm.label(ownerProxy, "Owner");
         vm.label(alice, "Alice");
         vm.label(bob, "Bob");
         vm.label(charlie, "Charlie");
@@ -92,10 +102,10 @@ contract AiProxyTest is Test {
     // ============ Constructor Tests ============
 
     function test_Constructor_InitializesCorrectly() public {
-        AiProxy newProxy = new AiProxy();
+        AiProxy newProxy = new AiProxy(ownerProxy);
         
         // Check that owner is set correctly
-        assertEq(newProxy.owner(), address(this), "Owner should be set correctly");
+        assertEq(newProxy.owner(), ownerProxy, "Owner should be set correctly");
         
         // Note: We can't easily test internal Chainlink state without exposing it
         // The constructor should set up the contract correctly
@@ -127,7 +137,7 @@ contract AiProxyTest is Test {
 
     function test_RequestAddressAnalysis_RevertWhen_InsufficientLINK() public {
         // Drain the contract of LINK tokens
-        vm.prank(owner);
+        vm.prank(ownerProxy);
         aiProxy.withdrawLink();
         
         vm.prank(alice);
@@ -259,7 +269,7 @@ contract AiProxyTest is Test {
         aiProxy.setJobId("new_job_id");
         
         // Owner should be able to set it
-        vm.prank(owner);
+        vm.prank(ownerProxy);
         aiProxy.setJobId("new_job_id");
     }
 
@@ -271,7 +281,7 @@ contract AiProxyTest is Test {
         aiProxy.setOracle(newOracle);
         
         // Owner should be able to set it
-        vm.prank(owner);
+        vm.prank(ownerProxy);
         aiProxy.setOracle(newOracle);
     }
 
@@ -281,7 +291,7 @@ contract AiProxyTest is Test {
         aiProxy.withdrawLink();
         
         // Owner should be able to withdraw
-        vm.prank(owner);
+        vm.prank(ownerProxy);
         aiProxy.withdrawLink();
     }
 
@@ -420,6 +430,8 @@ contract AiProxyTest is Test {
         
         // Create a mock requestId for testing
         bytes32 requestId = keccak256(abi.encodePacked(testAddress1, block.timestamp));
+        console.log("requestId:");
+        console.logBytes32(requestId);
         
         vm.prank(address(mockOracle));
         uint256 gasBefore = gasleft();

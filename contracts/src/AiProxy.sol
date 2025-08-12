@@ -5,6 +5,8 @@ import {Chainlink, ChainlinkClient} from "@chainlink/contracts/src/v0.8/Chainlin
 import {ConfirmedOwner} from "@chainlink/contracts/src/v0.8/shared/access/ConfirmedOwner.sol";
 import {LinkTokenInterface} from "@chainlink/contracts/src/v0.8/shared/interfaces/LinkTokenInterface.sol";
 
+// import {console2} from "forge-std/Test.sol";
+
 /**
  * AI Address Analysis Contract using Chainlink
  * This contract calls the Chainlink node to fetch AI analysis of Ethereum addresses
@@ -12,6 +14,8 @@ import {LinkTokenInterface} from "@chainlink/contracts/src/v0.8/shared/interface
  * THIS IS AN EXAMPLE CONTRACT THAT USES UN-AUDITED CODE.
  * DO NOT USE THIS CODE IN PRODUCTION.
  */
+
+
 
 contract AiProxy is ChainlinkClient, ConfirmedOwner {
     using Chainlink for Chainlink.Request;
@@ -56,7 +60,7 @@ contract AiProxy is ChainlinkClient, ConfirmedOwner {
      * jobId: Your job ID from the TOML definition
      *
      */
-    constructor() ConfirmedOwner(msg.sender) {
+    constructor(address owner_) ConfirmedOwner(owner_) {
         _setChainlinkToken(0x779877A7B0D9E8603169DdbD7836e478b4624789);
         _setChainlinkOracle(0x8BA4C2A6569173942A93750Cc2a1022f70d6252E);
         jobId = "YOUR_JOB_ID_HERE"; // Replace with your actual job ID
