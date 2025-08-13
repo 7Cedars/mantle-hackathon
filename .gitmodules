@@ -4,3 +4,6 @@
 [submodule "contracts/lib/chainlink-ccip"]
 	path = contracts/lib/chainlink-ccip
 	url = https://github.com/smartcontractkit/chainlink-ccip
+[submodule "contracts/lib/powers"]
+	path = contracts/lib/powers
+	url = https://github.com/7Cedars/powers
