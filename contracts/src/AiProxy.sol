@@ -64,13 +64,18 @@ contract AiProxy is ChainlinkClient, ConfirmedOwner {
      *
      * Sepolia Testnet details:
      * Link Token: 0x779877A7B0D9E8603169DdbD7836e478b4624789
-     * Oracle: 0x8BA4C2A6569173942A93750Cc2a1022f70d6252E (Your Oracle)
-     * jobId: Your job ID from the TOML definition
+     * Oracle: 0x3Ce3468bfEd90d6244bd6489F50F0fa69B289857 (Your Oracle)
+     * jobId: 4a6637dbf5ec485f92de9837149a97b0
+     *
+     * Mantle Sepolia Testnet details:
+     * Link Token: 0x22bdEdEa0beBdD7CfFC95bA53826E55afFE9DE04
+     * Oracle: 0xBDC0f941c144CB75f3773d9c2B2458A2f1506273
+     * jobId: 582d4373649642e0994ab29295c45db0
      *
      */
     constructor(address owner_) ConfirmedOwner(owner_) {
         _setChainlinkToken(0x779877A7B0D9E8603169DdbD7836e478b4624789);
-        _setChainlinkOracle(0x8BA4C2A6569173942A93750Cc2a1022f70d6252E);
+        _setChainlinkOracle(0x3Ce3468bfEd90d6244bd6489F50F0fa69B289857);
         jobId = "4a6637dbf5ec485f92de9837149a97b0"; 
         apiUrl = "https://ai-leviathan.vercel.app/api/address-analysis?address=";
     }
@@ -84,7 +89,7 @@ contract AiProxy is ChainlinkClient, ConfirmedOwner {
         
         Chainlink.Request memory req = _buildChainlinkRequest(
             jobId,
-            address(this),
+            address(this),  
             this.fulfillAddressAnalysis.selector
         );
         

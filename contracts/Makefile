@@ -122,8 +122,10 @@ install-deps:
 	@echo "Installing dependencies..."
 	forge install foundry-rs/forge-std@v1.9.1 --no-git && \
 	forge install openzeppelin/openzeppelin-contracts@v5.0.2 --no-git && \
-	forge install smartcontractkit/chainlink-evm@contracts-v1.4.0 && \
-	forge install smartcontractkit/chainlink-ccip@contracts-ccip-v1.6.0
+	forge install smartcontractkit/chainlink-evm@contracts-v1.4.0 --no-git && \
+	forge install smartcontractkit/chainlink-ccip@contracts-ccip-v1.6.0 --no-git && \
+	forge install 7Cedars/powers --no-git
+
 
 
 reset-deps:
@@ -131,8 +133,9 @@ reset-deps:
 	rm -rf lib/
 	forge install foundry-rs/forge-std@v1.9.1 --no-git && \
 	forge install openzeppelin/openzeppelin-contracts@v5.0.2 --no-git && \
-	forge install smartcontractkit/chainlink-evm@contracts-v1.4.0 && \
-	forge install smartcontractkit/chainlink-ccip@contracts-ccip-v1.6.0
+	forge install smartcontractkit/chainlink-evm@contracts-v1.4.0 --no-git && \
+	forge install smartcontractkit/chainlink-ccip@contracts-ccip-v1.6.0 --no-git && \
+	forge install 7Cedars/powers --no-git
 
 # Documentation
 doc:
@@ -276,7 +279,12 @@ info:
 SEPOLIA_DEPLOY_ARGS := --rpc-url $(SEPOLIA_RPC_URL) --account dev_3 --sender ${DEV2_ADDRESS} --broadcast --etherscan-api-key $(ETHERSCAN_API_KEY) --verifier etherscan --chain 11155111 --verify -vvvv
 MANTLE_SEPOLIA_DEPLOY_ARGS := --rpc-url $(MANTLE_SEPOLIA_RPC_URL) --account dev_3 --sender ${DEV2_ADDRESS} --broadcast --etherscan-api-key $(ETHERSCAN_API_KEY) --verifier etherscan --chain 5003 --verify -vvvv
 
-sepoliaDeployAiProxy :; forge script script/Deploy.s.sol:DeployScript $(SEPOLIA_DEPLOY_ARGS)
+sepoliaDeployAiProxy :; forge script script/DeployAiProxy.s.sol:DeployAiProxy $(SEPOLIA_DEPLOY_ARGS)
 sepoliaDeployCcipReceiveSend :; forge script script/DeployCcipReceiveSend.sol:DeployCcipReceiveSend $(SEPOLIA_DEPLOY_ARGS)
+sepoliaDeployAiCcipProxy :; forge script script/DeployAiCcipProxy.s.sol:DeployAiCcipProxy $(SEPOLIA_DEPLOY_ARGS)
 
+mantleSepoliaDeployAiProxy :; forge script script/DeployAiProxy.s.sol:DeployAiProxy $(MANTLE_SEPOLIA_DEPLOY_ARGS)
 mantleSepoliaDeployCcipSendReceive :; forge script script/DeployCcipSendReceive.sol:DeployCcipSendReceive $(MANTLE_SEPOLIA_DEPLOY_ARGS)
+mantleSepoliaDeployAddressAnalysis :; forge script script/DeployAddressAnalysis.s.sol:DeployAddressAnalysis $(MANTLE_SEPOLIA_DEPLOY_ARGS)
+
+mantleSepoliaDeployGovernance :; forge script script/DeployGovernance.s.sol:DeployGovernance $(MANTLE_SEPOLIA_DEPLOY_ARGS)
