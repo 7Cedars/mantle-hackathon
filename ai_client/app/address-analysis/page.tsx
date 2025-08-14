@@ -30,6 +30,9 @@ export default function AddressAnalysis() {
     setError(null);
     setAnalysisResult(null);
 
+    console.log("Address:", address);
+    console.log("Encoded Address:", encodeURIComponent(address))
+
     try {
       const response = await fetch(`/api/address-analysis?address=${encodeURIComponent(address)}`, {
         method: 'GET',
@@ -48,7 +51,7 @@ export default function AddressAnalysis() {
       try {
         parsedResponse = JSON.parse(result.response);
       } catch (parseError) {
-        throw new Error('Invalid response format from AI model');
+        throw new Error('Invalid response format from AI model: ' + parseError);
       }
 
       // Create the analysis result with the parsed data

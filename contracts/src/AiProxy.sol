@@ -59,26 +59,30 @@ contract AiProxy is ChainlinkClient, ConfirmedOwner {
     );
 
     /**
-     * @notice Initialize the link token and target oracle
-     * @dev The oracle address must be an Operator contract for multiword response
-     *
-     * Sepolia Testnet details:
-     * Link Token: 0x779877A7B0D9E8603169DdbD7836e478b4624789
-     * Oracle: 0x3Ce3468bfEd90d6244bd6489F50F0fa69B289857 (Your Oracle)
-     * jobId: 4a6637dbf5ec485f92de9837149a97b0
-     *
-     * Mantle Sepolia Testnet details:
-     * Link Token: 0x22bdEdEa0beBdD7CfFC95bA53826E55afFE9DE04
-     * Oracle: 0xBDC0f941c144CB75f3773d9c2B2458A2f1506273
-     * jobId: 582d4373649642e0994ab29295c45db0
-     *
+     * @notice Constructor initializes the contract with router, link token, and oracle addresses
+     * @param router The address of the CCIP router contract
+     * @param link The address of the LINK token contract
+     * @param oracle The address of the Chainlink oracle contract
+     * @param destinationChainSelector The destination chain selector for replies
+     * @param owner_ The owner of the contract
      */
-    constructor(address owner_) ConfirmedOwner(owner_) {
-        _setChainlinkToken(0x779877A7B0D9E8603169DdbD7836e478b4624789);
-        _setChainlinkOracle(0x3Ce3468bfEd90d6244bd6489F50F0fa69B289857);
-        jobId = "4a6637dbf5ec485f92de9837149a97b0"; 
+    constructor(
+        address router, 
+        address link,
+        address oracle,
+        uint64 destinationChainSelector,
+        address owner_
+    ) ConfirmedOwner(owner_) {
+        // s_destinationChainSelector = destinationChainSelector;
+        // s_linkToken = LinkTokenInterface(link);
+        
+        // Set up Chainlink
+        _setChainlinkToken(link);
+        _setChainlinkOracle(oracle);
+        jobId = "78f2cc21583f4e5eb677efb5cc528c5d";
         apiUrl = "https://ai-leviathan.vercel.app/api/address-analysis?address=";
     }
+
 
     /**
      * @notice Request AI analysis of an Ethereum address

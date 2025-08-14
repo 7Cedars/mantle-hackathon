@@ -25,9 +25,6 @@ Focus on analyzing:
 - Transaction frequency and patterns.
 - Token holdings and transfers.
 - Contract interactions (DeFi protocols, DAOs, games, etc.).
-- Gas usage patterns.
-- Time-based activity patterns.
-- Interaction with specific platforms or protocols.
 
 Try to avoid the "Other" category unless the address truly doesn't fit any of the defined categories.`;
 

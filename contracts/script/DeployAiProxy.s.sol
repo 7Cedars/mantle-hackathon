@@ -25,7 +25,13 @@ contract DeployAiProxy is Script {
         console.log("Starting deployment...");        
         vm.startBroadcast();
 
-        AiProxy aiProxy = new AiProxy(deployer);
+        AiProxy aiProxy = new AiProxy(
+            vm.envAddress("ROUTER_11155111"),
+            vm.envAddress("LINK_11155111"),
+            vm.envAddress("ORACLE_11155111"),
+            uint64(vm.envUint("CHAIN_SELECTOR_5003")), // destination chain. 
+            deployer
+        );
         aiProxyAddress = address(aiProxy);
 
         vm.stopBroadcast();

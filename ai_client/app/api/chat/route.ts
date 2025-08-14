@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     // Create server parameters for Alchemy MCP server
     const serverParams = new StdioClientTransport({
       command: "npx",
-      args: ["-y", "@alchemy/mcp-server"],
+      args: ["-y", "@alchemy/mcp-server@v0.1.5"],
       env: {
         ALCHEMY_API_KEY: alchemyApiKey || "",
       },

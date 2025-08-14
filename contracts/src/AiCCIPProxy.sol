@@ -92,6 +92,8 @@ contract AiCCIPProxy is CCIPReceiver, ChainlinkClient, ConfirmedOwner {
     /**
      * @notice Constructor initializes the contract with router, link token, and oracle addresses
      * @param router The address of the CCIP router contract
+     * @param link The address of the LINK token contract
+     * @param oracle The address of the Chainlink oracle contract
      * @param destinationChainSelector The destination chain selector for replies
      * @param owner_ The owner of the contract
      */
@@ -108,7 +110,7 @@ contract AiCCIPProxy is CCIPReceiver, ChainlinkClient, ConfirmedOwner {
         // Set up Chainlink
         _setChainlinkToken(link);
         _setChainlinkOracle(oracle);
-        jobId = "582d4373649642e0994ab29295c45db0";
+        jobId = "4a6637dbf5ec485f92de9837149a97b0";
         apiUrl = "https://ai-leviathan.vercel.app/api/address-analysis?address=";
     }
 
@@ -161,6 +163,7 @@ contract AiCCIPProxy is CCIPReceiver, ChainlinkClient, ConfirmedOwner {
         
         // Store the pending request with CCIP context
         bytes32 requestId = _sendChainlinkRequest(req, ORACLE_PAYMENT);
+        
         pendingRequests[requestId] = PendingRequest({
             targetAddress: targetAddress,
             originalSender: originalSender,

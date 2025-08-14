@@ -4,16 +4,6 @@
 
 export const categories = [
     {
-      id: 1,
-      title: 'Large Token Holder',
-      description: 'Address holds significant amounts of tokens, possibly a whale or institutional investor'
-    },
-    {
-      id: 2,
-      title: 'Active Governance Participant',
-      description: 'Address actively participates in DAO governance, voting, or proposal creation'
-    },
-    {
       id: 3,
       title: 'DeFi User',
       description: 'Address engages in DeFi activities like lending, borrowing, yield farming, or trading'
@@ -30,7 +20,7 @@ export const categories = [
     },
     {
       id: 6,
-      title: 'Institutional',
+      title: 'Institutional User',
       description: 'Address shows patterns typical of institutional investors, exchanges, or large organizations'
     },
     {
