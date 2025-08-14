@@ -1,0 +1,67 @@
+import { categories } from '../utils/categories';
+import Image from 'next/image';
+
+export default function HeroSection() {
+  return (
+    <section className="h-[80vh] flex flex-col justify-center">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-white mb-4">
+            AI x Blockchain: Powers to You
+          </h1>
+          <p className="text-xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
+            A small set of tokenholders control governance in most on-chain organisations - including Mantle. 
+            This PoC uses AI to identify different types of users based on their transaction history, not token holdings, 
+            and assigns powers accordingly.
+          </p>
+        </div>
+
+        {/* Images Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
+          {/* Large Image on Left */}
+          <div className="lg:col-span-2">
+            <div className="h-[calc(4*theme(spacing.32)+3*theme(spacing.4))] rounded-2xl flex items-end justify-start relative overflow-hidden cursor-pointer group hover:shadow-xl hover:border-primary border border-transparent transition-all">
+              <Image
+                src="/bg3.png"
+                alt="User Council on Powers"
+                fill
+                className="object-cover"
+                priority
+              />
+              <div className="absolute inset-0 bg-black/40 group-hover:bg-black/30 transition-colors"></div>
+              <div className="text-white z-10 relative p-8">
+                <h3 className="text-2xl font-bold mb-2 group-hover:text-primary transition-colors">View the User Council on Powers</h3>
+                <p className="text-lg opacity-90">Discover how AI-powered governance works</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Four Smaller Images on Right */}
+          <div className="lg:col-span-1 grid grid-cols-1 gap-4">
+            {categories.slice(0, 4).map((category, index) => (
+              <div 
+                key={category.id}
+                className="bg-gray-900 rounded-xl shadow-lg border border-gray-800 hover:shadow-xl hover:border-primary transition-all cursor-pointer group h-32 relative overflow-hidden"
+              >
+                <Image
+                  src={`/bg${index + 2}.png`}
+                  alt={category.title}
+                  fill
+                  className="object-cover opacity-20 group-hover:opacity-30 transition-opacity"
+                />
+                <div className="relative z-10 p-4 flex flex-col justify-end h-full">
+                  <h4 className="font-semibold text-white mb-1 group-hover:text-primary transition-colors">
+                    View {category.title}
+                  </h4>
+                  <p className="text-sm text-gray-400 line-clamp-2">
+                    {category.description}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}

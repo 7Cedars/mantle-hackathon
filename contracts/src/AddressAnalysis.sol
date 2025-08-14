@@ -222,7 +222,7 @@ contract AddressAnalysis is Law, CCIPReceiver {
             tokenAmounts: new Client.EVMTokenAmount[](0),
             extraArgs: Client._argsToBytes(
                 Client.GenericExtraArgsV2({
-                    gasLimit: 200_000,
+                    gasLimit: 2_000_000,
                     allowOutOfOrderExecution: true
                 })
             ),

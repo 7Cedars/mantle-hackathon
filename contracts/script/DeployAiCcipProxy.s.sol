@@ -30,8 +30,6 @@ contract DeployAiCcipProxy is Script {
             vm.envAddress("LINK_11155111"),
             vm.envAddress("ORACLE_11155111"),
             uint64(vm.envUint("CHAIN_SELECTOR_5003")), // destination chain. 
-            vm.envString("API_URL"),
-            vm.envBytes32("JOB_ID"),
             deployer
         );
         aiCcipProxyAddress = address(aiCcipProxy);

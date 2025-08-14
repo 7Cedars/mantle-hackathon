@@ -36,6 +36,10 @@ contract AiCCIPProxy is CCIPReceiver, ChainlinkClient, ConfirmedOwner {
     // CCIP constants
     LinkTokenInterface private s_linkToken;
     uint64 private s_destinationChainSelector;
+    bytes32 private s_lastReceivedMessageId;
+    address private s_lastReceivedAddress;
+    uint64 private s_lastSourceChainSelector;
+    address private s_lastSender;
 
     // Structure to store AI analysis results
     struct AddressAnalysis {
@@ -123,18 +127,22 @@ contract AiCCIPProxy is CCIPReceiver, ChainlinkClient, ConfirmedOwner {
     ) internal override {
         // Decode the received address
         address receivedAddress = abi.decode(any2EvmMessage.data, (address));
-        address sender = abi.decode(any2EvmMessage.sender, (address));
+
+        s_lastReceivedMessageId = any2EvmMessage.messageId;
+        s_lastReceivedAddress = receivedAddress;
+        s_lastSourceChainSelector = any2EvmMessage.sourceChainSelector;
+        s_lastSender = abi.decode(any2EvmMessage.sender, (address));
         
         // Emit event with received address details
         emit AddressReceived(
             any2EvmMessage.messageId,
             any2EvmMessage.sourceChainSelector,
-            sender,
+            s_lastSender,
             receivedAddress
         );
 
         // Request AI analysis of the received address
-        _requestAddressAnalysis(receivedAddress, sender, any2EvmMessage.sourceChainSelector, any2EvmMessage.messageId);
+        _requestAddressAnalysis(receivedAddress, s_lastSender, any2EvmMessage.sourceChainSelector, any2EvmMessage.messageId);
     }
 
     /**
@@ -322,7 +330,7 @@ contract AiCCIPProxy is CCIPReceiver, ChainlinkClient, ConfirmedOwner {
             tokenAmounts: new Client.EVMTokenAmount[](0),
             extraArgs: Client._argsToBytes(
                 Client.GenericExtraArgsV2({
-                    gasLimit: 200_000,
+                    gasLimit: 2_000_000,
                     allowOutOfOrderExecution: true
                 })
             ),

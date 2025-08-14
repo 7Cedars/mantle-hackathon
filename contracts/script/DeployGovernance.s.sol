@@ -38,7 +38,7 @@ contract DeployGovernance is Script {
     address addressAnalysis;
 
     function run() external returns (address payable powers_) {
-        addressAnalysis = 0x37ebF5dC32e3e851B8f7927a9B849d1Aa2c6C417; // for now all hardcoded. 
+        addressAnalysis = 0xD9e4eA8Bd3CCd2627f122E07Fa4C49Bc0766baF4; // for now all hardcoded. 
 
         // Deploy the DAO and a mock erc20 votes contract.
         vm.startBroadcast();
