@@ -7,23 +7,30 @@ import { getBlock, getPublicClient, readContract, readContracts } from "wagmi/ac
 import { bytesToParams, parseChainId, parseMetadata } from "@/config/parsers";
 import { useParams } from "next/navigation";
 import { useBlockNumber } from "wagmi";
+import { mantleSepoliaTestnet } from '@wagmi/core/chains';
 
 export const useAddressCheck = () => {
   const [status, setStatus ] = useState<Status>("idle")
   const [error, setError] = useState<any | null>(null)
   const [analysis, setAnalysis] = useState<{category: number, explanation: string, roleId: number, analyzed: boolean} | undefined>() 
   const { chainId, powers: address } = useParams<{ chainId: string, powers: `0x${string}` }>()
+  
+  // Use a default chain if no URL params (for ClaimSection usage)
+  const defaultChainId = mantleSepoliaTestnet.id
+  const effectiveChainId = chainId ? parseChainId(chainId) : defaultChainId
+  
   const publicClient = getPublicClient(wagmiConfig, {
-    chainId: parseChainId(chainId), 
+    chainId: effectiveChainId, 
   })
   const {data: currentBlock} = useBlockNumber({
-    chainId: parseChainId(chainId), 
+    chainId: effectiveChainId, 
   })
-  console.log("@useAddressCheck, MAIN", {chainId, error, analysis, publicClient, status})
+  console.log("@useAddressCheck, MAIN", {chainId, effectiveChainId, error, analysis, publicClient, status})
 
 
   const checkAddress = useCallback(async (lawId: bigint, powersAddress: `0x${string}`, userAddress: `0x${string}`) => {
     console.log("@checkAddress, waypoint 0", { lawId, powersAddress, userAddress })
+    console.log("@checkAddress, publicClient exists:", !!publicClient)
     setStatus("pending")
 
     if (publicClient && lawId && powersAddress && userAddress) {
@@ -73,6 +80,15 @@ export const useAddressCheck = () => {
       setError("Missing required parameters")
     }
   }, [publicClient])
+
+  // Auto-check for role assignment when component mounts with URL params
+  useEffect(() => {
+    if (chainId && address && !analysis) {
+      // This will use the URL parameters if available
+      console.log("@useAddressCheck, auto-checking with URL params", { chainId, address })
+      // Note: This would need the lawId from URL params or constants
+    }
+  }, [chainId, address, analysis])
 
 
 

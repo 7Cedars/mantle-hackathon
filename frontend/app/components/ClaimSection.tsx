@@ -2,14 +2,16 @@
 
 import Image from 'next/image';
 import { useLaw } from '@/hooks/useLaw';
-import { useAccount } from 'wagmi';
+import { usePrivy } from '@privy-io/react-auth';
 import { CLAIM_LAW_ID, POWERS_ADDRESS } from '@/config/constants';
 import TrackProgress from './TrackProgress';
 import { useState, useEffect } from 'react';
 import { useAddressCheck } from '@/hooks/useAddressCheck';
+import { categories } from '../utils/categories';
 
 export default function ClaimSection() {
-  const { address } = useAccount();
+  const { user, authenticated } = usePrivy();
+  const address = user?.wallet?.address as `0x${string}` | undefined;
   const { status, error, executions, simulation, resetStatus, simulate, execute, fetchExecutions } = useLaw();
   const { checkAddress, analysis, status: addressCheckStatus } = useAddressCheck();
   const [hasClaimed, setHasClaimed] = useState(() => {
@@ -30,11 +32,8 @@ export default function ClaimSection() {
   };
 
   const handleClaim = async () => {
-    console.log("handleClaim");
     const nonce = generateRandomNonce();
-    console.log("nonce", nonce);
     await execute(POWERS_ADDRESS as `0x${string}`, CLAIM_LAW_ID, "0x", nonce, "Request for address analysis.");
-    console.log("executed");
     setHasClaimed(true);
     // Store in localStorage
     localStorage.setItem('hasClaimed', 'true');
@@ -50,6 +49,13 @@ export default function ClaimSection() {
     }
   };
 
+
+
+  // Helper function to get category details
+  const getCategoryDetails = (categoryId: number) => {
+    return categories.find((cat: { id: number; title: string; description: string }) => cat.id === categoryId);
+  };
+
   // Auto-check for role assignment when timer completes
   useEffect(() => {
     if (hasClaimed && address && analysis === undefined) {
@@ -61,7 +67,7 @@ export default function ClaimSection() {
           const seventySevenMinutes = 77 * 60 * 1000; // 77 minutes in milliseconds
           
           if (elapsed >= seventySevenMinutes) {
-            console.log("Timer completed, checking for role assignment...");
+            // Call checkAddress with the correct parameters
             checkAddress(CLAIM_LAW_ID, POWERS_ADDRESS as `0x${string}`, address);
           }
         }
@@ -72,6 +78,22 @@ export default function ClaimSection() {
       const interval = setInterval(checkTimeElapsed, 30000);
       
       return () => clearInterval(interval);
+    }
+  }, [hasClaimed, address, analysis, checkAddress]);
+
+  // Additional effect to trigger check when timer completes
+  useEffect(() => {
+    if (hasClaimed && address && analysis === undefined) {
+      const startTime = localStorage.getItem('trackProgressStartTime');
+      if (startTime) {
+        const elapsed = Date.now() - parseInt(startTime);
+        const seventySevenMinutes = 77 * 60 * 1000;
+        
+        // If timer has already completed, check immediately
+        if (elapsed >= seventySevenMinutes) {
+          checkAddress(CLAIM_LAW_ID, POWERS_ADDRESS as `0x${string}`, address);
+        }
+      }
     }
   }, [hasClaimed, address, analysis, checkAddress]);
 
@@ -111,15 +133,26 @@ export default function ClaimSection() {
       {/* Track Progress Component or Category Display */}
       {analysis ? (
         <div className="text-center mt-8">
-          <div className="bg-gray-800 rounded-lg p-6 max-w-md mx-auto">
-            <h3 className="text-2xl font-bold text-white mb-4">Your Category</h3>
+          <div className="bg-black rounded-lg p-6 max-w-md mx-auto">
             <div className="text-center">
-              <span className="text-4xl font-bold text-primary">{analysis.category}</span>
+              {(() => {
+                const categoryDetails = getCategoryDetails(analysis.category);
+                return categoryDetails ? (
+                  <div>
+                    <div className="text-3xl font-bold text-primary mb-3">{categoryDetails.title}</div>
+                    <div className="text-base text-gray-300 max-w-sm mx-auto">{categoryDetails.description}</div>
+                  </div>
+                ) : (
+                  <span className="text-4xl font-bold text-primary">Category {analysis.category}</span>
+                );
+              })()}
             </div>
           </div>
         </div>
       ) : (
-        <TrackProgress showCountdown={hasClaimed} />
+        <div className="text-center mt-8">
+          <TrackProgress showCountdown={hasClaimed} />
+        </div>
       )}
 
 
