@@ -144,6 +144,7 @@ sequenceDiagram
 
     Note over User, Powers: Flow Complete - User has been analyzed and assigned powers
 ```
+```
 
 ### System Components
 
