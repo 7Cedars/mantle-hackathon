@@ -1605,3 +1605,20 @@ export const lawAbi: Abi = [
   { "type": "error", "name": "Law__ParentNotCompleted", "inputs": [] },
   { "type": "error", "name": "Law__ProposalNotSucceeded", "inputs": [] }
 ]
+
+export const addressAnalysisAbi: Abi = [
+  {
+    "type": "function",
+    "name": "getAddressAnalysis",
+    "inputs": [
+      { "name": "targetAddress", "type": "address", "internalType": "address" }
+    ],
+    "outputs": [
+      { "name": "category", "type": "uint256", "internalType": "uint256" },
+      { "name": "explanation", "type": "string", "internalType": "string" },
+      { "name": "roleId", "type": "uint256", "internalType": "uint256" },
+      { "name": "analyzed", "type": "bool", "internalType": "bool" }
+    ],
+    "stateMutability": "view"
+  }
+]

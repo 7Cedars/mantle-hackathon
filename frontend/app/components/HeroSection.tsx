@@ -24,9 +24,9 @@ export default function HeroSection() {
             AI x Blockchain: Powers to You
           </h1>
           <p className="text-xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
-            A small set of tokenholders control governance in most on-chain organisations - including Mantle. 
-            This PoC uses AI to identify different types of users based on their transaction history, not token holdings, 
-            and assigns powers accordingly.
+            Whales control governance in most on-chain organisations. 
+            This PoC uses AI to identify different types of users based on their transaction history, not token holdings, and assigns powers accordingly.
+            No air drops. No farming. Just users & the separation of powers.
           </p>
         </div>
 
@@ -48,7 +48,7 @@ export default function HeroSection() {
               <div className="absolute inset-0 bg-black/40 group-hover:bg-black/30 transition-colors"></div>
               <div className="text-white z-10 relative p-8">
                 <h3 className="text-2xl font-bold mb-2 group-hover:text-primary transition-colors">View the User Council on Powers</h3>
-                <p className="text-lg opacity-90">Discover how AI-powered governance works</p>
+                <p className="text-lg opacity-90">Discover how governance is distributed between users</p>
               </div>
             </div>
           </div>

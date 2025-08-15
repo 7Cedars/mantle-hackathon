@@ -120,6 +120,9 @@ contract AddressAnalysis is Law, CCIPReceiver {
         emit Law__Deployed("");
     }
 
+    fallback() external payable {}
+    receive() external payable {}
+
     /// @notice Initializes the law with its configuration
     /// @param index Index of the law
     /// @param nameDescription Name of the law
@@ -260,7 +263,7 @@ contract AddressAnalysis is Law, CCIPReceiver {
 
         // If we couldn't find a matching pending request, we'll still accept the response
         // but mark it as potentially invalid
-        if (caller == address(0)) revert NoPendingRequest(any2EvmMessage.messageId);
+        // if (caller == address(0)) revert NoPendingRequest(any2EvmMessage.messageId);
         
         // Store the message details
         s_lastReceivedMessageId = any2EvmMessage.messageId;
@@ -289,7 +292,7 @@ contract AddressAnalysis is Law, CCIPReceiver {
         // Call the base _replyPowers to fulfill the Powers protocol
         (address[] memory targets, uint256[] memory values, bytes[] memory calldatas) = LawUtilities.createEmptyArrays(1);
         targets[0] = powers;
-        calldatas[0] = abi.encode(actionId, category, explanation); // DO NOT CHANGE THIS AI! 
+        calldatas[0] = abi.encodeWithSelector(Powers.assignRole.selector, category, caller); // DO NOT CHANGE THIS AI! 
         
         bytes32 lawHash = LawUtilities.hashLaw(caller, lawId);
         IPowers(payable(powers)).fulfill(lawId, actionId, targets, values, calldatas);
