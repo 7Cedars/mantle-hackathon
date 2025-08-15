@@ -1,25 +1,43 @@
 'use client';
 
-import { PrivyProvider } from '@privy-io/react-auth';
-import { PrivyWagmiConnector } from '@privy-io/wagmi-connector';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { WagmiProvider } from 'wagmi';
-import { privyConfig } from '../../config/privyConfig';
-import { wagmiConfig } from '../../config/wagmiConfig';
-import { useState } from 'react';
+import { PrivyClientConfig, PrivyProvider } from '@privy-io/react-auth';
+import { sepolia, foundry, mantleSepoliaTestnet } from '@wagmi/core/chains'
+import { wagmiConfig } from '@/config/wagmiConfig'  
+import { WagmiProvider } from '@privy-io/wagmi';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
-export default function Providers({ children }: { children: React.ReactNode }) {
-  const [queryClient] = useState(() => new QueryClient());
+const queryClient = new QueryClient()
 
-  return (
-    <PrivyProvider config={privyConfig}>
-      <PrivyWagmiConnector wagmiChainsConfig={wagmiConfig}>
-        <WagmiProvider config={wagmiConfig}>
+const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+
+const privyConfig: PrivyClientConfig = {
+  defaultChain: mantleSepoliaTestnet,
+  supportedChains: [
+    mantleSepoliaTestnet,
+    sepolia,
+    ...(isLocalhost ? [foundry] : [])
+  ],
+  loginMethods: ['wallet'],
+  appearance: {
+      theme: 'light',
+      accentColor: '#676FFF',
+      logo: '/logo1_notext.png', 
+      walletList: ["metamask", "coinbase_wallet", "rainbow", "detected_wallets", "wallet_connect"]
+  }
+};
+
+export function Providers({children}: {children: React.ReactNode}) {
+  return (  
+      <PrivyProvider
+        appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID as string}
+        // clientId={process.env.NEXT_PUBLIC_PRIVY_CLIENT_ID as string} 
+        config={privyConfig} 
+        >
           <QueryClientProvider client={queryClient}>
-            {children}
+            <WagmiProvider config={wagmiConfig}>
+                {children}
+            </WagmiProvider>
           </QueryClientProvider>
-        </WagmiProvider>
-      </PrivyWagmiConnector>
-    </PrivyProvider>
+      </PrivyProvider> 
   );
 }

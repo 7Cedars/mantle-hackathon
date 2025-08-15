@@ -7,12 +7,9 @@ import { categories } from './categories';
  * Note: at this time eth-mainnet and base-mainnet are the only networks supported. It seems. 
  * I need to write devs + maybe check out another MCP. 
  */
-export function createAddressAnalysisMessage(address: `0x${string}`): string {
-  const categoryList = categories.map(cat => `${cat.id}. **${cat.title}** - ${cat.description}`).join('\n');
-  
-  return `Please analyze the on-chain history of the Ethereum address ${address} and identify which of the following user types best fits this address:
 
-${categoryList}
+/*
+-- Normal prompt. 
 
 Please provide:
 - The most appropriate user type category by number. 
@@ -28,4 +25,18 @@ Focus on analyzing:
 
 Try to avoid the "Other" category unless the address truly doesn't fit any of the defined categories.`;
 
+-- due to issues with the MCP server from alchemy. For now we'll return a random category. 
+
+*/
+
+export function createAddressAnalysisMessage(address: `0x${string}`): string {
+  const categoryList = categories.map(cat => `${cat.id}. **${cat.title}** - ${cat.description}`).join('\n');
+  
+  return `Please analyze the on-chain history of the Ethereum address ${address} and identify which of the following user types best fits this address:
+
+  ${categoryList}
+
+  Please return a random category number between 1 and 6. As an explanation, please return "I think this category fits this address best.". 
+  `;
 }
+

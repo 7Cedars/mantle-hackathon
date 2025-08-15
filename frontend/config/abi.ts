@@ -216,6 +216,13 @@ export const powersAbi: Abi = [
   },
   {
     "type": "function",
+    "name": "DENOMINATOR",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
     "name": "PUBLIC_ROLE",
     "inputs": [],
     "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
@@ -542,25 +549,6 @@ export const powersAbi: Abi = [
   },
   {
     "type": "function",
-    "name": "getDeposits",
-    "inputs": [
-      { "name": "account", "type": "address", "internalType": "address" }
-    ],
-    "outputs": [
-      {
-        "name": "accountDeposits",
-        "type": "tuple[]",
-        "internalType": "struct PowersTypes.Deposit[]",
-        "components": [
-          { "name": "amount", "type": "uint256", "internalType": "uint256" },
-          { "name": "atBlock", "type": "uint48", "internalType": "uint48" }
-        ]
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
     "name": "getProposedActionDeadline",
     "inputs": [
       { "name": "actionId", "type": "uint256", "internalType": "uint256" }
@@ -833,6 +821,12 @@ export const powersAbi: Abi = [
         "type": "uint256",
         "indexed": false,
         "internalType": "uint256"
+      },
+      {
+        "name": "sender",
+        "type": "address",
+        "indexed": false,
+        "internalType": "address"
       }
     ],
     "anonymous": false

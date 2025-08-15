@@ -16,6 +16,8 @@
 /// @dev This law sends msg.sender to AiCCIPProxy for AI analysis and assigns roles based on results
 /// @author 7Cedars
 
+// Note: Data validation is hardly present at this stage. It's a PoC.. 
+
 pragma solidity ^0.8.26;
 
 import { Law } from "@powers/Law.sol";
@@ -41,12 +43,14 @@ contract AddressAnalysis is Law, CCIPReceiver {
     // Events
     event AddressAnalysisRequested(
         bytes32 indexed messageId,
+        uint256 indexed actionId,
         address indexed caller,
         address aiCCIPProxy
     );
 
     event AddressAnalysisReceived(
         bytes32 indexed messageId,
+        uint256 indexed actionId,
         address indexed caller,
         uint256 category,
         string explanation
@@ -75,22 +79,22 @@ contract AddressAnalysis is Law, CCIPReceiver {
     // Mapping to store analysis results by address
     mapping(address => AddressAnalysisResult) public addressAnalyses;
     
-    // Mapping to track pending requests: actionId => caller
-    mapping(uint256 => address) private s_pendingRequests;
-    // Mapping to track messageId => actionId, lawId
-    struct PendingMessage {
-        uint256 actionId;
-        address powers;
+    // Mapping to track actionId => lawId, caller, powers, processed
+    struct PendingRequest {
+        address caller;
         uint16 lawId;
+        address powers;
         bool processed;
     }
-    mapping(bytes32 => PendingMessage) private s_pendingMessages;
+    // stores the pending request for each actionId
+    mapping(uint256 => PendingRequest) private s_pendingRequests;
 
     // Store the last received analysis details
     bytes32 private s_lastReceivedMessageId;
     address private s_lastAnalyzedAddress;
     uint64 private s_lastSourceChainSelector;
     address private s_lastSender;
+    uint256 private s_lastActionId;
 
     /// @notice Constructor initializes the contract with router and link token addresses
     /// @param router The address of the CCIP router contract
@@ -98,7 +102,7 @@ contract AddressAnalysis is Law, CCIPReceiver {
     /// @param destinationChainSelector The destination chain selector for replies
 
     /** Mantle Sepolia Testnet details:
-     * Link Token: 0x22bdEdEa0beBdD7CfFC95bA53826E55afFE9DE04
+     * Link Token: 0x22bdEdEa0beBdD7CfFC95bA53826E55afFE9DE04 
      * Oracle: 0xBDC0f941c144CB75f3773d9c2B2458A2f1506273
      * jobId: 582d4373649642e0994ab29295c45db0
      *
@@ -166,24 +170,10 @@ contract AddressAnalysis is Law, CCIPReceiver {
         if (s_aiCCIPProxy == address(0)) {
             revert AiCCIPProxyNotSet();
         }
-
-        // Check if address has already been analyzed -- people are allowed to reanalyse their addresses. 
-        // if (addressAnalyses[caller].analyzed) {
-        //     revert("Address already analyzed");
-        // }
-
         actionId = LawUtilities.hashActionId(lawId, lawCalldata, nonce);
 
-        // For this law, we don't make external calls during handleRequest
-        // Instead, we'll trigger the CCIP flow directly in _replyPowers
-        // This allows us to properly handle the cross-chain communication
-        
-        // Create empty arrays since we'll handle the CCIP call in _replyPowers
-        (targets, values, calldatas) = LawUtilities.createEmptyArrays(1);
-
         // State change to store the caller and actionId for later processing
-        stateChange = abi.encode(caller, actionId);
-
+        stateChange = abi.encode(caller, actionId, lawId);
         return (actionId, targets, values, calldatas, stateChange);
     }
 
@@ -191,11 +181,16 @@ contract AddressAnalysis is Law, CCIPReceiver {
     /// @param lawHash The hash of the law
     /// @param stateChange Encoded state changes to apply
     function _changeState(bytes32 lawHash, bytes memory stateChange) internal override {
-        (address caller, uint256 actionId) = abi.decode(stateChange, (address, uint256));
+        (address caller, uint256 actionId, uint16 lawId) = abi.decode(stateChange, (address, uint256, uint16));
         
         // Store the pending request for when we receive the analysis back
         // We'll use the actionId as a key to track this request
-        s_pendingRequests[actionId] = caller;
+        s_pendingRequests[actionId] = PendingRequest({
+            caller: caller,
+            lawId: lawId,
+            powers: laws[lawHash].executions.powers,
+            processed: false
+        });
     }
 
     /// @notice Override _replyPowers to handle CCIP communication with AiCCIPProxy
@@ -212,13 +207,13 @@ contract AddressAnalysis is Law, CCIPReceiver {
         bytes[] memory calldatas
     ) internal override {
         // Get the caller from the pending requests
-        address caller = s_pendingRequests[actionId];
+        address caller = s_pendingRequests[actionId].caller;
         require(caller != address(0), "Caller not found in pending requests");
 
         // Create CCIP message to send to AiCCIPProxy
         Client.EVM2AnyMessage memory evm2AnyMessage = Client.EVM2AnyMessage({
             receiver: abi.encode(s_aiCCIPProxy),
-            data: abi.encode(caller), // Send the caller's address
+            data: abi.encode(actionId, caller), // Send the caller's address & actionId
             tokenAmounts: new Client.EVMTokenAmount[](0),
             extraArgs: Client._argsToBytes(
                 Client.GenericExtraArgsV2({
@@ -244,20 +239,10 @@ contract AddressAnalysis is Law, CCIPReceiver {
 
         // Send the message through the router
         bytes32 messageId = IRouterClient(getRouter()).ccipSend(s_destinationChainSelector, evm2AnyMessage);
-        bytes32 lawHash = LawUtilities.hashLaw(caller, lawId);
-        // Store the messageId to actionId mapping
-        s_pendingMessages[messageId] = PendingMessage({
-            actionId: actionId,
-            lawId: lawId,
-            powers: laws[lawHash].executions.powers,
-            processed: false
-        });
 
-        // Emit event for the sent message
-        emit AddressAnalysisRequested(messageId, caller, s_aiCCIPProxy);
+        emit AddressAnalysisRequested(messageId, actionId, caller, s_aiCCIPProxy);
 
-        // Call the base _replyPowers to fulfill the Powers protocol
-        super._replyPowers(lawId, actionId, targets, values, calldatas);
+        // We do not reply to powers at this stage - only after the call is returned from AiCCIPProxy. 
     }
 
     /// @notice Handle a received message from another chain (the AI analysis result)
@@ -266,29 +251,21 @@ contract AddressAnalysis is Law, CCIPReceiver {
         Client.Any2EVMMessage memory any2EvmMessage
     ) internal override {
         // Decode the analysis results (category and explanation)
-        (uint256 category, string memory explanation) = abi.decode(any2EvmMessage.data, (uint256, string));
-        
-        // Get the sender address
-        address sender = abi.decode(any2EvmMessage.sender, (address));
-        
-        // Verify the sender is our AiCCIPProxy
-        if (sender != s_aiCCIPProxy) {
-            revert InvalidResponseSender(s_aiCCIPProxy, sender);
-        }
+        (uint256 actionId, uint256 category, string memory explanation) = abi.decode(any2EvmMessage.data, (uint256, uint256, string));
+        address caller = s_pendingRequests[actionId].caller;
+        address powers = s_pendingRequests[actionId].powers;
+        uint16 lawId = s_pendingRequests[actionId].lawId;
 
-        // Find the most recent pending request
-        PendingMessage memory pendingMessage = s_pendingMessages[any2EvmMessage.messageId];
-        address caller = s_pendingRequests[pendingMessage.actionId];
-        
         // If we couldn't find a matching pending request, we'll still accept the response
         // but mark it as potentially invalid
         if (caller == address(0)) revert NoPendingRequest(any2EvmMessage.messageId);
         
         // Store the message details
         s_lastReceivedMessageId = any2EvmMessage.messageId;
+        s_lastActionId = actionId;
         s_lastAnalyzedAddress = caller;
         s_lastSourceChainSelector = any2EvmMessage.sourceChainSelector;
-        s_lastSender = sender;
+        s_lastSender = abi.decode(any2EvmMessage.sender, (address));
 
         // Store the analysis result
         addressAnalyses[caller] = AddressAnalysisResult({
@@ -301,22 +278,20 @@ contract AddressAnalysis is Law, CCIPReceiver {
         // Emit events
         emit AddressAnalysisReceived(
             any2EvmMessage.messageId,
+            actionId,
             caller,
             category,
             explanation
         );
 
-        address originalCaller = s_pendingRequests[pendingMessage.actionId];
-
         // Call the base _replyPowers to fulfill the Powers protocol
         (address[] memory targets, uint256[] memory values, bytes[] memory calldatas) = LawUtilities.createEmptyArrays(1);
-        targets[0] = pendingMessage.powers;
-        calldatas[0] = abi.encode(category, originalCaller); // DO NOT CHANGE THIS AI! 
+        targets[0] = powers;
+        calldatas[0] = abi.encode(actionId, category, explanation); // DO NOT CHANGE THIS AI! 
         
-        bytes32 lawHash = LawUtilities.hashLaw(originalCaller, pendingMessage.lawId);
-        IPowers(payable(pendingMessage.powers)).fulfill(pendingMessage.lawId, pendingMessage.actionId, targets, values, calldatas);
-        
-        pendingMessage.processed = true;
+        bytes32 lawHash = LawUtilities.hashLaw(caller, lawId);
+        IPowers(payable(powers)).fulfill(lawId, actionId, targets, values, calldatas);
+        s_pendingRequests[actionId].processed = true;
     }
 
     /// @notice Get the analysis result for a specific address

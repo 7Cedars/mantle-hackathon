@@ -285,6 +285,6 @@ sepoliaDeployAiCcipProxy :; forge script script/DeployAiCcipProxy.s.sol:DeployAi
 
 mantleSepoliaDeployAiProxy :; forge script script/DeployAiProxy.s.sol:DeployAiProxy $(MANTLE_SEPOLIA_DEPLOY_ARGS)
 mantleSepoliaDeployCcipSendReceive :; forge script script/DeployCcipSendReceive.sol:DeployCcipSendReceive $(MANTLE_SEPOLIA_DEPLOY_ARGS)
-mantleSepoliaDeployAddressAnalysis :; forge script script/DeployAddressAnalysis.s.sol:DeployAddressAnalysis $(MANTLE_SEPOLIA_DEPLOY_ARGS)
+# mantleSepoliaDeployAddressAnalysis :; forge script script/DeployAddressAnalysis.s.sol:DeployAddressAnalysis $(MANTLE_SEPOLIA_DEPLOY_ARGS)
 
 mantleSepoliaDeployGovernance :; forge script script/DeployGovernance.s.sol:DeployGovernance $(MANTLE_SEPOLIA_DEPLOY_ARGS)

@@ -5,9 +5,25 @@
 :root {
   --foreground-rgb: 255, 255, 255;
   --background-rgb: 0, 0, 0;
+  --primary: 95, 170, 166;
+  --primary-dark: 74, 138, 135;
 }
 
 body {
   color: rgb(var(--foreground-rgb));
   background: rgb(var(--background-rgb));
+}
+
+@layer utilities {
+  .bg-primary {
+    background-color: rgb(var(--primary));
+  }
+  
+  .bg-primary-dark {
+    background-color: rgb(var(--primary-dark));
+  }
+  
+  .hover\:bg-primary:hover {
+    background-color: rgb(var(--primary));
+  }
 }

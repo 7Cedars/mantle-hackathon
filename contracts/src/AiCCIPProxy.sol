@@ -40,6 +40,7 @@ contract AiCCIPProxy is CCIPReceiver, ChainlinkClient, ConfirmedOwner {
     address private s_lastReceivedAddress;
     uint64 private s_lastSourceChainSelector;
     address private s_lastSender;
+    uint256 private s_lastActionId;
 
     // Structure to store AI analysis results
     struct AddressAnalysis {
@@ -55,6 +56,7 @@ contract AiCCIPProxy is CCIPReceiver, ChainlinkClient, ConfirmedOwner {
 
     // Structure to store pending request context
     struct PendingRequest {
+        uint256 actionId;
         address targetAddress;
         address originalSender;
         uint64 sourceChainSelector;
@@ -64,6 +66,7 @@ contract AiCCIPProxy is CCIPReceiver, ChainlinkClient, ConfirmedOwner {
     // Events
     event AddressReceived(
         bytes32 indexed messageId,
+        uint256 indexed actionId,
         uint64 indexed sourceChainSelector,
         address sender,
         address receivedAddress
@@ -71,6 +74,7 @@ contract AiCCIPProxy is CCIPReceiver, ChainlinkClient, ConfirmedOwner {
 
     event AddressAnalysisRequested(
         bytes32 indexed requestId,
+        uint256 indexed actionId,
         address indexed targetAddress,
         address originalSender,
         uint64 sourceChainSelector
@@ -78,6 +82,7 @@ contract AiCCIPProxy is CCIPReceiver, ChainlinkClient, ConfirmedOwner {
 
     event AddressAnalysisFulfilled(
         bytes32 indexed requestId,
+        uint256 indexed actionId,
         address indexed targetAddress,
         uint256 category,
         string explanation
@@ -85,6 +90,7 @@ contract AiCCIPProxy is CCIPReceiver, ChainlinkClient, ConfirmedOwner {
 
     event ReplySent(
         bytes32 indexed messageId,
+        uint256 indexed actionId,
         uint64 indexed destinationChainSelector,
         address receiver,
         uint256 category,
@@ -126,23 +132,25 @@ contract AiCCIPProxy is CCIPReceiver, ChainlinkClient, ConfirmedOwner {
         Client.Any2EVMMessage memory any2EvmMessage
     ) internal override {
         // Decode the received address
-        address receivedAddress = abi.decode(any2EvmMessage.data, (address));
+        (uint256 actionId, address receivedAddress) = abi.decode(any2EvmMessage.data, (uint256, address));
 
         s_lastReceivedMessageId = any2EvmMessage.messageId;
         s_lastReceivedAddress = receivedAddress;
+        s_lastActionId = actionId;
         s_lastSourceChainSelector = any2EvmMessage.sourceChainSelector;
         s_lastSender = abi.decode(any2EvmMessage.sender, (address));
         
         // Emit event with received address details
         emit AddressReceived(
             any2EvmMessage.messageId,
+            actionId,
             any2EvmMessage.sourceChainSelector,
             s_lastSender,
             receivedAddress
         );
 
         // Request AI analysis of the received address
-        _requestAddressAnalysis(receivedAddress, s_lastSender, any2EvmMessage.sourceChainSelector, any2EvmMessage.messageId);
+        _requestAddressAnalysis(actionId, receivedAddress, s_lastSender, any2EvmMessage.sourceChainSelector, any2EvmMessage.messageId);
     }
 
     /**
@@ -153,6 +161,7 @@ contract AiCCIPProxy is CCIPReceiver, ChainlinkClient, ConfirmedOwner {
      * @param ccipMessageId The original CCIP message ID
      */
     function _requestAddressAnalysis(
+        uint256 actionId,
         address targetAddress,
         address originalSender,
         uint64 sourceChainSelector,
@@ -171,15 +180,17 @@ contract AiCCIPProxy is CCIPReceiver, ChainlinkClient, ConfirmedOwner {
         
         // Store the pending request with CCIP context
         bytes32 requestId = _sendChainlinkRequest(req, ORACLE_PAYMENT);
-        
+
+        // Store the pending request with CCIP context
         pendingRequests[requestId] = PendingRequest({
+            actionId: actionId,
             targetAddress: targetAddress,
             originalSender: originalSender,
             sourceChainSelector: sourceChainSelector,
             ccipMessageId: ccipMessageId
         });
         
-        emit AddressAnalysisRequested(requestId, targetAddress, originalSender, sourceChainSelector);
+        emit AddressAnalysisRequested(requestId, actionId, targetAddress, originalSender, sourceChainSelector);
     }
 
     /**
@@ -206,6 +217,7 @@ contract AiCCIPProxy is CCIPReceiver, ChainlinkClient, ConfirmedOwner {
         // Send the analysis results back to the original sender
         _sendReplyBack(
             pendingRequest.originalSender,
+            pendingRequest.actionId,
             category,
             explanation
         );
@@ -215,6 +227,7 @@ contract AiCCIPProxy is CCIPReceiver, ChainlinkClient, ConfirmedOwner {
         
         emit AddressAnalysisFulfilled(
             requestId,
+            pendingRequest.actionId,
             pendingRequest.targetAddress,
             category,
             explanation
@@ -230,10 +243,11 @@ contract AiCCIPProxy is CCIPReceiver, ChainlinkClient, ConfirmedOwner {
      */
     function sendReply(
         address receiver,
+        uint256 actionId,
         uint256 category,
         string memory explanation
     ) external onlyOwner returns (bytes32 messageId) {
-        return _sendReplyBack(receiver, category, explanation);
+        return _sendReplyBack(receiver, actionId, category, explanation);
     }
 
     /**
@@ -245,13 +259,14 @@ contract AiCCIPProxy is CCIPReceiver, ChainlinkClient, ConfirmedOwner {
      */
     function _sendReplyBack(
         address receiver,
+        uint256 actionId,
         uint256 category,
         string memory explanation
     ) internal returns (bytes32 messageId) {
         // Create an EVM2AnyMessage struct in memory
         Client.EVM2AnyMessage memory evm2AnyMessage = Client.EVM2AnyMessage({
             receiver: abi.encode(receiver),
-            data: abi.encode(category, explanation), // Encode both category and explanation
+            data: abi.encode(actionId, category, explanation), // Encode actionId, category and explanation
             tokenAmounts: new Client.EVMTokenAmount[](0),
             extraArgs: Client._argsToBytes(
                 Client.GenericExtraArgsV2({
@@ -280,6 +295,7 @@ contract AiCCIPProxy is CCIPReceiver, ChainlinkClient, ConfirmedOwner {
         // Emit event for the reply message
         emit ReplySent(
             messageId,
+            actionId,
             s_destinationChainSelector,
             receiver,
             category,
@@ -315,18 +331,20 @@ contract AiCCIPProxy is CCIPReceiver, ChainlinkClient, ConfirmedOwner {
     /**
      * @notice Get the fee required to send a reply to another chain
      * @param receiver The address of the recipient on the destination blockchain
+     * @param actionId The action ID
      * @param category The AI analysis category
      * @param explanation The AI analysis explanation
      * @return fees The fees required to send the message
      */
     function getReplyFee(
         address receiver,
+        uint256 actionId,
         uint256 category,
         string memory explanation
     ) external view returns (uint256 fees) {
         Client.EVM2AnyMessage memory evm2AnyMessage = Client.EVM2AnyMessage({
             receiver: abi.encode(receiver),
-            data: abi.encode(category, explanation),
+            data: abi.encode(actionId, category, explanation),
             tokenAmounts: new Client.EVMTokenAmount[](0),
             extraArgs: Client._argsToBytes(
                 Client.GenericExtraArgsV2({

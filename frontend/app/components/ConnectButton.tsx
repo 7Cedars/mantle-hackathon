@@ -2,56 +2,48 @@
 
 import { usePrivy } from '@privy-io/react-auth';
 import { useAccount, useDisconnect } from 'wagmi';
-import { useEffect, useState } from 'react';
 
 export default function ConnectButton() {
   const { login, logout, authenticated, user, ready } = usePrivy();
-  const { address, isConnected } = useAccount();
+  const { address } = useAccount();
   const { disconnect } = useDisconnect();
-  const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const handleLogin = () => {
+    console.log("handleLogin");
+    login();
+  };
 
-  if (!mounted) {
-    return (
-      <button className="bg-primary-dark hover:bg-primary text-white px-8 py-2 rounded-lg font-medium transition-colors w-32">
-        Loading...
-      </button>
-    );
-  }
+  const handleLogout = () => {
+    console.log("handleLogout");
+    logout();
+    disconnect();
+  };
 
   if (!ready) {
     return (
-      <button className="bg-primary-dark hover:bg-primary text-white px-8 py-2 rounded-lg font-medium transition-colors w-32">
+      <button className="bg-gray-600 text-white px-8 py-2 rounded-lg font-medium transition-colors w-32 cursor-not-allowed">
         Loading...
       </button>
     );
   }
 
-  if (authenticated && isConnected) {
+  if (authenticated && user) {
     return (
-      <div className="flex items-center gap-3">
-        <div className="text-sm text-gray-300">
-          {address ? `${address.slice(0, 6)}...${address.slice(-4)}` : 'Connected'}
-        </div>
-        <button
-          onClick={() => {
-            logout();
-            disconnect();
-          }}
-          className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
-        >
-          Disconnect
-        </button>
-      </div>
+      <button 
+        onClick={handleLogout}
+        className="bg-primary-dark hover:bg-primary text-white px-4 py-2 rounded-lg font-medium transition-colors w-40"
+      >
+        {user.wallet?.address ? 
+          `${user.wallet.address.slice(0, 6)}...${user.wallet.address.slice(-4)}` : 
+          'Connected'
+        }
+      </button>
     );
   }
 
   return (
-    <button
-      onClick={login}
+    <button 
+      onClick={handleLogin}
       className="bg-primary-dark hover:bg-primary text-white px-8 py-2 rounded-lg font-medium transition-colors w-32"
     >
       Connect

@@ -1,7 +1,7 @@
 'use client';
 
 import { PrivyClientConfig, PrivyProvider } from '@privy-io/react-auth';
-import { foundry, mantaSepoliaTestnet } from '@wagmi/core/chains'
+import { foundry, mantleSepoliaTestnet } from '@wagmi/core/chains'
 import { wagmiConfig } from './wagmiConfig'  
 import { WagmiProvider } from '@privy-io/wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -11,9 +11,9 @@ const queryClient = new QueryClient()
 const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
 
 const privyConfig: PrivyClientConfig = {
-  defaultChain: mantaSepoliaTestnet,
+  defaultChain: mantleSepoliaTestnet,
   supportedChains: [
-    mantaSepoliaTestnet,
+    mantleSepoliaTestnet,
     ...(isLocalhost ? [foundry] : [])
   ],
   loginMethods: ['wallet'],

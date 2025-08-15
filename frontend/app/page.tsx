@@ -4,16 +4,16 @@ import ClaimSection from './components/ClaimSection';
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-black snap-y snap-mandatory pt-16">
+    <div className="h-screen bg-black snap-y snap-mandatory overflow-y-scroll pt-16">
       <Navigation />
       
-      <main className="snap-start">
+      <section className="snap-start h-screen">
         <HeroSection />
-      </main>
+      </section>
       
-      <main className="snap-start">
+      <section className="snap-start h-screen">
         <ClaimSection />
-      </main>
+      </section>
     </div>
   );
 }

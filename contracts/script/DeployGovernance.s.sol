@@ -27,6 +27,7 @@ import { Powers } from "@powers/Powers.sol";
 import { IPowers } from "@powers/interfaces/IPowers.sol";
 import { ILaw } from "@powers/interfaces/ILaw.sol";
 import { PowersTypes } from "@powers/interfaces/PowersTypes.sol";
+import { AddressAnalysis } from "../src/AddressAnalysis.sol";
 
 
 /// @notice core script to deploy a dao
@@ -37,8 +38,8 @@ contract DeployGovernance is Script {
     uint256 blocksPerHour;
     address addressAnalysis;
 
-    function run() external returns (address payable powers_) {
-        addressAnalysis = 0xD9e4eA8Bd3CCd2627f122E07Fa4C49Bc0766baF4; // for now all hardcoded. 
+    function run() external returns (address payable powers_, address addressAnalysis_) {
+        addressAnalysis = deployAddressAnalysis();  
 
         // Deploy the DAO and a mock erc20 votes contract.
         vm.startBroadcast();
@@ -58,7 +59,21 @@ contract DeployGovernance is Script {
         powers.constitute(lawInitData);
         vm.stopBroadcast();
 
-        return (powers_);
+        return (powers_, addressAnalysis_);
+    }
+
+    function deployAddressAnalysis() public returns (address addressAnalysis_) {
+        vm.startBroadcast();
+
+        AddressAnalysis addressAnalysisContract = new AddressAnalysis(
+            vm.envAddress("ROUTER_5003"),
+            vm.envAddress("LINK_5003"),
+            uint64(vm.envUint("CHAIN_SELECTOR_11155111")), // destination chain 
+            vm.envAddress("AI_CCIP_PROXY_11155111")
+        );
+        vm.stopBroadcast();
+        
+        return address(addressAnalysisContract);
     }
 
     function createConstitution(
@@ -74,7 +89,7 @@ contract DeployGovernance is Script {
         // User receive executive powers according to their role.
         // anyone can call the role. It is throttled to avoid over use of the api and bridges.  
         conditions.allowedRole = type(uint256).max; // public role  
-        conditions.throttleExecution = minutesToBlocks(1); // this law can be called once every minute. 
+        // conditions.throttleExecution = minutesToBlocks(1); // this law can be called once every minute. 
         lawInitData[1] = PowersTypes.LawInitData({
             nameDescription: "AI role assignment: Let an AI assess your on-chain activity and assign you a role accordingly.",
             targetLaw: addressAnalysis,

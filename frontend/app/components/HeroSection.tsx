@@ -1,10 +1,12 @@
+'use client';
+
 import { categories } from '../utils/categories';
 import Image from 'next/image';
 
 export default function HeroSection() {
   return (
-    <section className="h-[80vh] flex flex-col justify-center">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="h-screen flex flex-col justify-center">
+      <div className="max-w-7xl mx-auto px-4 sm:pt-6 lg:pt-8">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-white mb-4">
             AI x Blockchain: Powers to You
@@ -59,6 +61,26 @@ export default function HeroSection() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+        
+        {/* Scroll Down Indicator */}
+        <div className="flex justify-center mt-24 pt-24">
+          <div>
+            <svg 
+              className="w-24 h-24 text-primary cursor-pointer opacity-50 hover:text-primary-light transition-colors transform rotate-180" 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24" 
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth={2} 
+                d="M5 15l7-7 7 7" 
+              />
+            </svg>
           </div>
         </div>
       </div>
