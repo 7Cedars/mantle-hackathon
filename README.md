@@ -11,7 +11,7 @@
     <img src="frontend/public/bg-circular.png" alt="Mantle Hackathon" width="240" height="240" style="border-radius: 50%; object-fit: cover; display: block; margin: 0 auto;">
   </a>
 
-<h3 align="center">Powers</h3>
+<h3 align="center">Powers To Users</h3>
   <p align="center">
     An AI-powered cross-chain address analysis system that integrates with the Powers governance protocol  
     <br />
