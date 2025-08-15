@@ -2,8 +2,20 @@
 
 import { categories } from '../utils/categories';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { POWERS_ADDRESS } from '../../config/constants';
 
 export default function HeroSection() {
+  const router = useRouter();
+
+  const handleLargeImageClick = () => {
+    router.push(`https://powers-protocol.vercel.app/5003/${POWERS_ADDRESS}`);
+  };
+
+  const handleSmallImageClick = (categoryId: number) => {
+    router.push(`/user-powers?category=${categoryId}`);
+  };
+
   return (
     <section className="h-screen flex flex-col justify-center">
       <div className="max-w-7xl mx-auto px-4 sm:pt-6 lg:pt-8">
@@ -22,7 +34,10 @@ export default function HeroSection() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
           {/* Large Image on Left */}
           <div className="lg:col-span-2">
-            <div className="h-[calc(4*theme(spacing.32)+3*theme(spacing.4))] rounded-2xl flex items-end justify-start relative overflow-hidden cursor-pointer group hover:shadow-xl hover:border-primary border border-transparent transition-all">
+            <div 
+              className="h-[calc(4*theme(spacing.32)+3*theme(spacing.4))] rounded-2xl flex items-end justify-start relative overflow-hidden cursor-pointer group hover:shadow-xl hover:border-primary border border-transparent transition-all"
+              onClick={handleLargeImageClick}
+            >
               <Image
                 src="/bg3.png"
                 alt="User Council on Powers"
@@ -44,6 +59,7 @@ export default function HeroSection() {
               <div 
                 key={category.id}
                 className="bg-gray-900 rounded-xl shadow-lg border border-gray-800 hover:shadow-xl hover:border-primary transition-all cursor-pointer group h-32 relative overflow-hidden"
+                onClick={() => handleSmallImageClick(category.id)}
               >
                 <Image
                   src={`/bg${index + 2}.png`}

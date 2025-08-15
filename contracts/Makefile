@@ -120,22 +120,22 @@ update-deps:
 
 install-deps:
 	@echo "Installing dependencies..."
-	forge install foundry-rs/forge-std@v1.9.1 --no-git && \
-	forge install openzeppelin/openzeppelin-contracts@v5.0.2 --no-git && \
-	forge install smartcontractkit/chainlink-evm@contracts-v1.4.0 --no-git && \
-	forge install smartcontractkit/chainlink-ccip@contracts-ccip-v1.6.0 --no-git && \
-	forge install 7Cedars/powers --no-git
+	forge install foundry-rs/forge-std@v1.9.1 --no-commit --no-git && \
+	forge install openzeppelin/openzeppelin-contracts@v5.0.2 --no-commit --no-git && \
+	forge install smartcontractkit/chainlink-evm@contracts-v1.4.0 --no-commit --no-git && \
+	forge install smartcontractkit/chainlink-ccip@contracts-ccip-v1.6.0 --no-commit --no-git && \
+	forge install 7Cedars/powers --no-commit --no-git
 
 
 
 reset-deps:
 	@echo "Resetting dependencies..."
 	rm -rf lib/
-	forge install foundry-rs/forge-std@v1.9.1 --no-git && \
-	forge install openzeppelin/openzeppelin-contracts@v5.0.2 --no-git && \
-	forge install smartcontractkit/chainlink-evm@contracts-v1.4.0 --no-git && \
-	forge install smartcontractkit/chainlink-ccip@contracts-ccip-v1.6.0 --no-git && \
-	forge install 7Cedars/powers --no-git
+	forge install foundry-rs/forge-std@v1.9.1 --no-commit --no-git && \
+	forge install openzeppelin/openzeppelin-contracts@v5.0.2 --no-commit --no-git && \
+	forge install smartcontractkit/chainlink-evm@contracts-v1.4.0 --no-commit --no-git && \
+	forge install smartcontractkit/chainlink-ccip@contracts-ccip-v1.6.0 --no-commit --no-git && \
+	forge install 7Cedars/powers --no-commit --no-git
 
 # Documentation
 doc:

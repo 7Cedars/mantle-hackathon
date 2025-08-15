@@ -41,13 +41,13 @@ export async function GET(request: NextRequest) {
   try {
 
     // Create server parameters for Alchemy MCP server
-    // const serverParams = new StdioClientTransport({
-    //   command: "npx",
-    //   args: ["-y", "@alchemy/mcp-server@v0.1.5"],
-    //   env: {
-    //     ALCHEMY_API_KEY: alchemyApiKey || "",
-    //   },
-    // });
+    const serverParams = new StdioClientTransport({
+      command: "npx",
+      args: ["-y", "@alchemy/mcp-server@v0.1.5"],
+      env: {
+        ALCHEMY_API_KEY: alchemyApiKey || "",
+      },
+    });
 
     // Create MCP client
     const client = new Client({
@@ -56,7 +56,7 @@ export async function GET(request: NextRequest) {
     });
 
     // Initialize the connection between client and server
-    // await client.connect(serverParams);
+    await client.connect(serverParams);
 
     try {
       // Create the analysis message using the utility function
@@ -70,7 +70,7 @@ export async function GET(request: NextRequest) {
         model: "gemini-2.5-pro",
         contents: analysisMessage,
         config: {
-          // tools: [mcpToTool(client)], // uses the session, will automatically call the tool
+          tools: [mcpToTool(client)], // uses the session, will automatically call the tool
           responseMimeType: "application/json",
           responseSchema: {
             type: Type.OBJECT,
@@ -101,8 +101,8 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error("Error calling Gemini API for address analysis:", error);
     const errorResponse = JSON.stringify({
-      category: 9,
-      explanation: "Error calling Gemini API for address analysis"
+      category: 5,
+      explanation: "I think the user best fits category 5 (mcp error)."
     });
 
     return NextResponse.json({ 

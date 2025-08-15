@@ -1,2 +1,2 @@
 export const CLAIM_LAW_ID = 1n;
-export const POWERS_ADDRESS = "0xf0cfddaf9fd7c07e9d369fcd8cde2c631399ba29";
+export const POWERS_ADDRESS = "0xb6192f4219765be4d91677AeA9d24A0a9e955a5b";

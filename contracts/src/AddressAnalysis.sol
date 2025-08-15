@@ -172,6 +172,8 @@ contract AddressAnalysis is Law, CCIPReceiver {
         }
         actionId = LawUtilities.hashActionId(lawId, lawCalldata, nonce);
 
+        (targets, values, calldatas) = LawUtilities.createEmptyArrays(1);
+
         // State change to store the caller and actionId for later processing
         stateChange = abi.encode(caller, actionId, lawId);
         return (actionId, targets, values, calldatas, stateChange);
