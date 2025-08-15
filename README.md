@@ -183,6 +183,12 @@ sequenceDiagram
 - **Governance Rights**: User gains specific powers based on their category
 - **On-Chain Verification**: All assignments are recorded on Mantle blockchain
 
+## To do 
+- Fix the MCP integration with google Gemini AI. It started to malfunction yesterday. 
+- Build the governance system of the user council. 
+- Integrate governance interaction in UI. 
+- Various bug fixes across the frontend UI. 
+
 ## Important files and folders
 
 ```
