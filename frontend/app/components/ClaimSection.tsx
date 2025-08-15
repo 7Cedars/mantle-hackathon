@@ -40,6 +40,16 @@ export default function ClaimSection() {
     localStorage.setItem('hasClaimed', 'true');
   };
 
+  const handleOrbClick = () => {
+    if (analysis) {
+      // Navigate to user powers page with the assigned category
+      window.location.href = `/user-powers?category=${analysis.roleId}`;
+    } else {
+      // If no analysis yet, trigger the claim process
+      handleClaim();
+    }
+  };
+
   // Auto-check for role assignment when timer completes
   useEffect(() => {
     if (hasClaimed && address && analysis === undefined) {
@@ -70,10 +80,10 @@ export default function ClaimSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24">
         <div className="text-center mb-12 pt-16">
           <h2 className="text-4xl font-bold text-white mb-4">
-            Claim Your Powers
+            {analysis ? 'Powers claimed!' : 'Claim Your Powers'}
           </h2>
           <p className="text-xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
-            Press the orb to claim your powers
+            {analysis ? 'Press the orb to view your powers' : 'Press the orb to claim your powers'}
           </p>
         </div>
 
@@ -81,11 +91,13 @@ export default function ClaimSection() {
         <div className="flex justify-center">
           <button 
             className={`w-[calc(4*theme(spacing.32)+3*theme(spacing.4))] h-[calc(4*theme(spacing.32)+3*theme(spacing.4))] rounded-full shadow-2xl transition-all duration-200 relative overflow-hidden ${
-              hasClaimed 
+              analysis 
+                ? 'bg-green-500 hover:bg-green-400 hover:scale-105' 
+                : hasClaimed 
                 ? 'animate-spin-slow bg-red-500' 
                 : 'hover:shadow-primary/25 hover:scale-105'
             }`}
-            onClick={handleClaim}
+            onClick={handleOrbClick}
           >
             <Image
               src="/bg-circular.png"
@@ -96,33 +108,21 @@ export default function ClaimSection() {
           </button>
         </div>
       </div>
-      {/* Track Progress Component */}
-      <TrackProgress showCountdown={hasClaimed} />
-
-      {/* Analysis Results */}
-      {analysis && (
+      {/* Track Progress Component or Category Display */}
+      {analysis ? (
         <div className="text-center mt-8">
-          <h3 className="text-2xl font-bold text-white mb-4">
-            Role Assignment Complete! 
-          </h3>
-          <div className="bg-gray-800 rounded-lg p-6 max-w-2xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
-              <div>
-                <span className="text-gray-400">Category:</span>
-                <span className="text-white ml-2 font-semibold">{analysis.category}</span>
-              </div>
-              <div>
-                <span className="text-gray-400">Role ID:</span>
-                <span className="text-white ml-2 font-semibold">{analysis.roleId}</span>
-              </div>
-              <div className="md:col-span-2">
-                <span className="text-gray-400">Explanation:</span>
-                <p className="text-white mt-1">{analysis.explanation}</p>
-              </div>
+          <div className="bg-gray-800 rounded-lg p-6 max-w-md mx-auto">
+            <h3 className="text-2xl font-bold text-white mb-4">Your Category</h3>
+            <div className="text-center">
+              <span className="text-4xl font-bold text-primary">{analysis.category}</span>
             </div>
           </div>
         </div>
+      ) : (
+        <TrackProgress showCountdown={hasClaimed} />
       )}
+
+
 
       
 

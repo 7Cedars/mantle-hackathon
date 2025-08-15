@@ -1,11 +1,31 @@
 # <div align="center">Mantle Hackathon Project</div>
 
-<img src="frontend/public/bg-circular.png" alt="Mantle Hackathon" width="240" height="240" style="border-radius: 50%; object-fit: cover; display: block; margin: 0 auto;">
+
 
 ### <div align="center">Mantle Hackathon</div>
 
-An AI-powered cross-chain address analysis system that integrates with the Powers governance protocol  
-Solidity protocol · Proof of Concept · Live Demo · Documentation
+<!-- PROJECT LOGO -->
+<br />
+<div align="center">
+  <a href="https://github.com/7Cedars/mantle_hackathon"> 
+    <img src="frontend/public/bg-circular.png" alt="Mantle Hackathon" width="240" height="240" style="border-radius: 50%; object-fit: cover; display: block; margin: 0 auto;">
+  </a>
+
+<h3 align="center">Powers</h3>
+  <p align="center">
+    An AI-powered cross-chain address analysis system that integrates with the Powers governance protocol  
+    <br />
+    <!--NB: TO DO -->  
+    <a href="/contracts">Solidity protocol</a> ·
+    <a href="https://sepolia.mantlescan.xyz/address/0xe9D450BBcE3f1c4524FcAC0190C9F75b6c67833B">Proof of Concept (mantle)</a> ·
+    <a href="https://mantle-ai-powers.vercel.app/">Live Demo</a>
+  </p>
+</div>
+
+<div align="center">
+  For an introduction into the protocol, see
+   <a href="https://www.tella.tv/video/powers-1-aijc"><b> the 2 minute project pitch</b>. </a>
+</div>
 
 ## About
 
@@ -143,7 +163,6 @@ sequenceDiagram
     UI->>User: Display results and<br/>assigned powers
 
     Note over User, Powers: Flow Complete - User has been analyzed and assigned powers
-```
 ```
 
 ### System Components
