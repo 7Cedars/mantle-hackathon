@@ -130,7 +130,14 @@ export default function ClaimSection() {
       <div className="absolute bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 w-full">
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-12 text-sm text-gray-400">
-            <span className="hover:text-primary transition-colors cursor-pointer">Github Repository</span>
+            <a 
+              href="https://github.com/7Cedars/mantle-hackathon" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="hover:text-primary transition-colors cursor-pointer"
+            >
+              Github Repository
+            </a>
             <span>made with ❤️ by 7cedars</span>
           </div>
         </div>
