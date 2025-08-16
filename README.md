@@ -24,7 +24,7 @@
 
 <div align="center">
   For an introduction into the protocol, see
-   <a href="https://www.tella.tv/video/powers-1-aijc"><b> the 2 minute project pitch</b>. </a>
+   <a href="https://www.loom.com/share/06061af6b85042b1b0479d3c392c9156"><b> the 2 minute project pitch</b>. </a>
 </div>
 
 ## About
