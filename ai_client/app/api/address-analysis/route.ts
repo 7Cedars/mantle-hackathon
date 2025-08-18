@@ -95,8 +95,8 @@ export async function GET(request: NextRequest) {
       let parsedResponse;
       
       // Log the raw response for debugging
-      console.log("Raw response from Gemini:", responseText);
-      console.log("Response length:", responseText.length);
+      // console.log("Raw response from Gemini:", responseText);
+      // console.log("Response length:", responseText.length);
       
       try {
         // Check if response is empty or only whitespace
@@ -114,8 +114,8 @@ export async function GET(request: NextRequest) {
           cleanedText = cleanedText.replace(/^```\s*/, '').replace(/\s*```$/, '');
         }
         
-        console.log("Cleaned text:", cleanedText);
-        console.log("Cleaned text length:", cleanedText.length);
+        // console.log("Cleaned text:", cleanedText);
+        // console.log("Cleaned text length:", cleanedText.length);
         
         // Check if cleaned text is empty
         if (!cleanedText || cleanedText.trim().length === 0) {
@@ -125,8 +125,8 @@ export async function GET(request: NextRequest) {
         // Try to parse the cleaned response as JSON
         parsedResponse = JSON.parse(cleanedText);
       } catch (parseError) {
-        console.error("Failed to parse response as JSON:", responseText);
-        console.error("Parse error:", parseError);
+        // console.error("Failed to parse response as JSON:", responseText);
+        // console.error("Parse error:", parseError);
         
         // Fallback: create a default response
         parsedResponse = {

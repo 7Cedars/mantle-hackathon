@@ -19,18 +19,18 @@ const ai = new GoogleGenAI({ apiKey });
 
 export async function POST(request: NextRequest) {
   // Add immediate logging to confirm the route is being called
-  console.log('🚀 API ROUTE CALLED - /api/chat');
-  console.log('Request method:', request.method);
-  console.log('Request URL:', request.url);
+  // console.log('🚀 API ROUTE CALLED - /api/chat');
+  // console.log('Request method:', request.method);
+  // console.log('Request URL:', request.url);
   
   try {
     const { message } = await request.json();
 
     // Log the incoming request
-    console.log('=== INCOMING CHAT REQUEST ===');
-    console.log('Message:', message);
-    console.log('Timestamp:', new Date().toISOString());
-    console.log('=== END REQUEST LOG ===');
+    // console.log('=== INCOMING CHAT REQUEST ===');
+    // console.log('Message:', message);
+    // console.log('Timestamp:', new Date().toISOString());
+    // console.log('=== END REQUEST LOG ===');
 
     if (!message) {
       return NextResponse.json(
@@ -75,16 +75,16 @@ export async function POST(request: NextRequest) {
       const responseText = response.candidates?.[0]?.content?.parts?.map((part: any) => part.text).join('') || response.text || 'No response generated';
       
       // Log the full response for debugging
-      console.log('=== GEMINI API RESPONSE DEBUG ===');
-      console.log('Full response object:', JSON.stringify(response, null, 2));
-      console.log('Extracted response text:', responseText);
-      console.log('Response candidates:', response.candidates);
-      console.log('Response parts:', response.candidates?.[0]?.content?.parts);
-      console.log('=== END DEBUG ===');
+      // console.log('=== GEMINI API RESPONSE DEBUG ===');
+      // console.log('Full response object:', JSON.stringify(response, null, 2));
+      // console.log('Extracted response text:', responseText);
+      // console.log('Response candidates:', response.candidates);
+      // console.log('Response parts:', response.candidates?.[0]?.content?.parts);
+      // console.log('=== END DEBUG ===');
       
-      console.log('✅ SUCCESS: Sending response back to client');
-      console.log('Response length:', responseText.length);
-      console.log('Response preview:', responseText.substring(0, 200) + '...');
+      // console.log('✅ SUCCESS: Sending response back to client');
+      // console.log('Response length:', responseText.length);
+      // console.log('Response preview:', responseText.substring(0, 200) + '...');
       
       return NextResponse.json({ 
         response: responseText
@@ -95,11 +95,11 @@ export async function POST(request: NextRequest) {
       console.log('🔌 MCP Client connection closed');
     }
   } catch (error) {
-    console.error("=== GEMINI API ERROR ===");
-    console.error("Error details:", error);
-    console.error("Error message:", error instanceof Error ? error.message : 'Unknown error');
-    console.error("Error stack:", error instanceof Error ? error.stack : 'No stack trace');
-    console.error("=== END ERROR LOG ===");
+    // console.error("=== GEMINI API ERROR ===");
+    // console.error("Error details:", error);
+    // console.error("Error message:", error instanceof Error ? error.message : 'Unknown error');
+    // console.error("Error stack:", error instanceof Error ? error.stack : 'No stack trace');
+    // console.error("=== END ERROR LOG ===");
     
     return NextResponse.json(
       { error: "Failed to get response from Gemini" },
