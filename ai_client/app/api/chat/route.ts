@@ -29,13 +29,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Create server parameters for Alchemy MCP server
-    const serverParams = new StdioClientTransport({
-      command: "npx",
-      args: ["-y", "@alchemy/mcp-server@v0.1.5"],
-      env: {
-        ALCHEMY_API_KEY: alchemyApiKey || "",
-      },
-    });
+    // const serverParams = new StdioClientTransport({
+    //   command: "npx",
+    //   args: ["-y", "@alchemy/mcp-server@v0.1.5"],
+    //   env: {
+    //     ALCHEMY_API_KEY: alchemyApiKey || "",
+    //   },
+    // });
 
     // Create MCP client
     const client = new Client({
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Initialize the connection between client and server
-    await client.connect(serverParams);
+    // await client.connect(serverParams);
 
     try {
       // Send request to the model with MCP tools
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
         model: "gemini-2.5-pro",
         contents: message,
         config: {
-          tools: [mcpToTool(client)], // uses the session, will automatically call the tool
+          // tools: [mcpToTool(client)], // uses the session, will automatically call the tool
           // Uncomment if you **don't** want the sdk to automatically call the tool
           // automaticFunctionCalling: {
           //   disable: true,
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
       });
     } finally {
       // Close the connection
-      await client.close();
+      // await client.close();
     }
   } catch (error) {
     console.error("Error calling Gemini API:", error);
