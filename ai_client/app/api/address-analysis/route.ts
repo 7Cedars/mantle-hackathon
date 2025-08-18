@@ -49,14 +49,26 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    // Create MCP client
+    // Create MCP client with timeout
     const client = new Client({
       name: "gemini-address-analysis-app",
       version: "1.0.0",
     });
 
+    // Set connection timeout for Vercel
+    const connectionTimeout = setTimeout(() => {
+      console.error("MCP connection timeout");
+      throw new Error("MCP connection timeout - serverless environment may be too slow");
+    }, 15000); // 15 seconds
+
     // Initialize the connection between client and server
-    await client.connect(serverParams);
+    try {
+      await client.connect(serverParams);
+      console.log("MCP client connected successfully");
+    } catch (connectionError) {
+      console.error("Failed to connect MCP client:", connectionError);
+      throw new Error(`MCP connection failed: ${connectionError}`);
+    }
 
     try {
       // Create the analysis message using the utility function
@@ -153,8 +165,14 @@ export async function GET(request: NextRequest) {
         address: address
       });
     } finally {
-      // Close the connection
-      await client.close();
+      // Clear timeout and close the connection
+      clearTimeout(connectionTimeout);
+      try {
+        await client.close();
+        console.log("MCP client closed successfully");
+      } catch (closeError) {
+        console.error("Error closing MCP client:", closeError);
+      }
     }
   } catch (error) {
     console.error("Error calling Gemini API for address analysis:", error);
