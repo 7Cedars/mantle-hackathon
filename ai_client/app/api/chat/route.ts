@@ -1,18 +1,11 @@
-import { GoogleGenAI, FunctionCallingConfigMode, mcpToTool} from '@google/genai';
-import { Client } from "@modelcontextprotocol/sdk/client/index.js";
-import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
+import { GoogleGenAI } from '@google/genai';
 import { NextRequest, NextResponse } from "next/server";
 
 // Get API key from environment variables
 const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
-const alchemyApiKey = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY;
 
 if (!apiKey) {
   throw new Error("GEMINI_API_KEY environment variable is not set");
-}
-
-if (!alchemyApiKey) {
-  throw new Error("ALCHEMY_API_KEY environment variable is not set");
 }
 
 const ai = new GoogleGenAI({ apiKey });
@@ -39,37 +32,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create server parameters for Alchemy MCP server
-    const serverParams = new StdioClientTransport({
-      command: "npx",
-      args: ["-y", "@alchemy/mcp-server@v0.1.5"],
-      env: {
-        ALCHEMY_API_KEY: alchemyApiKey || "",
-      },
+    // Send request to the model
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-pro",
+      contents: message,
     });
-
-    // Create MCP client
-    const client = new Client({
-      name: "gemini-chat-app",
-      version: "1.0.0",
-    });
-
-    // Initialize the connection between client and server
-    await client.connect(serverParams);
-
-    try {
-      // Send request to the model with MCP tools
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-pro",
-        contents: message,
-        config: {
-          tools: [mcpToTool(client)], // uses the session, will automatically call the tool
-          // Uncomment if you **don't** want the sdk to automatically call the tool
-          // automaticFunctionCalling: {
-          //   disable: true,
-          // },
-        },
-      });
 
       // Extract the full text content from the response
       const responseText = response.candidates?.[0]?.content?.parts?.map((part: any) => part.text).join('') || response.text || 'No response generated';
@@ -89,11 +56,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ 
         response: responseText
       });
-    } finally {
-      // Close the connection
-      await client.close();
-      console.log('🔌 MCP Client connection closed');
-    }
   } catch (error) {
     // console.error("=== GEMINI API ERROR ===");
     // console.error("Error details:", error);
