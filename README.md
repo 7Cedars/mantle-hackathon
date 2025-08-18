@@ -11,7 +11,7 @@
     <img src="frontend/public/bg-circular.png" alt="Mantle Hackathon" width="240" height="240" style="border-radius: 50%; object-fit: cover; display: block; margin: 0 auto;">
   </a>
 
-<h3 align="center">Powers</h3>
+<h3 align="center">Powers To Users</h3>
   <p align="center">
     An AI-powered cross-chain address analysis system that integrates with the Powers governance protocol  
     <br />
@@ -24,7 +24,7 @@
 
 <div align="center">
   For an introduction into the protocol, see
-   <a href="https://www.tella.tv/video/powers-1-aijc"><b> the 2 minute project pitch</b>. </a>
+   <a href="https://www.loom.com/share/06061af6b85042b1b0479d3c392c9156"><b> the 2 minute project pitch</b>. </a>
 </div>
 
 ## About
@@ -182,6 +182,12 @@ sequenceDiagram
 - **Role Assignment**: Category becomes roleId in Powers protocol
 - **Governance Rights**: User gains specific powers based on their category
 - **On-Chain Verification**: All assignments are recorded on Mantle blockchain
+
+## To do 
+- Fix the MCP integration with google Gemini AI. It started to malfunction yesterday. 
+- Build the governance system of the user council. 
+- Integrate governance interaction in UI. 
+- Various bug fixes across the frontend UI. 
 
 ## Important files and folders
 
