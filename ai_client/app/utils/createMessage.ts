@@ -18,24 +18,23 @@ import { categories } from './categories';
 */
 
 export function createAddressAnalysisMessage(address: `0x${string}`): string {
-  const categoryList = categories.map(cat => `${cat.id}. **${cat.title}** - ${cat.description}`).join('\n');
+  // const categoryList = categories.map(cat => `${cat.id}. **${cat.title}** - ${cat.description}`).join('\n');
+  const categoryList = categories.map(cat => `${cat.id}. ${cat.title}`).join('\n');
   
-  return `Please analyze the on-chain history of the Ethereum address ${address} and identify which of the following user types best fits this address:
+  return `Please analyze the on-chain history of the Ethereum address ${address} over the last six months and identify which of the following user types best fits this address:
 
-  ${categoryList}
+    ${categoryList}
 
-  Please provide:
-  - The most appropriate user type category by number. 
-  - Which networks the address is active on.
-  - An explanation of no more than 255 characters why this address falls into this category based on its transaction patterns, token holdings, and on-chain behavior
-  - If the address falls into the "Other" category, please explain, in no more than 255 characters, why it doesn't fit the other categories and what unique characteristics it has
+    Limit any queries to the last 6 months and to maximum 50 of the most recent transactions on eth-mainnet. 
 
-  Focus on analyzing:
-  - eth-mainnet and base-mainnet. 
-  - Transaction frequency and patterns.
-  - Token holdings and transfers.
-  - Contract interactions (DeFi protocols, DAOs, games, etc.).
+    IMPORTANT: You must respond with a valid JSON object containing:
+    - "category": A number between 1 and ${categories.length} representing the best matching category
+    - "explanation": A brief explanation (max 255 characters) of why this address fits the chosen category
 
-  Try to avoid the "Other" category unless the address truly doesn't fit any of the defined categories.`;
+    Example response format:
+    {
+      "category": 3,
+      "explanation": "This address shows frequent DeFi interactions with multiple protocols."
+    }`;
 }
 

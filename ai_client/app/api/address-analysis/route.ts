@@ -6,8 +6,8 @@ import { createAddressAnalysisMessage } from '../../utils/createMessage';
 import { categories } from '../../utils/categories';
 
 // Get API key from environment variables
-const apiKey = process.env.GEMINI_API_KEY;
-const alchemyApiKey = process.env.ALCHEMY_API_KEY;
+const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+const alchemyApiKey = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY;
 
 if (!apiKey) {
   throw new Error("GEMINI_API_KEY environment variable is not set");
@@ -71,7 +71,7 @@ export async function GET(request: NextRequest) {
         contents: analysisMessage,
         config: {
           tools: [mcpToTool(client)], // uses the session, will automatically call the tool
-          responseMimeType: "application/json",
+          // responseMimeType: "application/json",
           responseSchema: {
             type: Type.OBJECT,
             properties: {
@@ -90,8 +90,66 @@ export async function GET(request: NextRequest) {
         },
       });
 
+      // Extract the response text and try to parse it as JSON
+      const responseText = response.text || '';
+      let parsedResponse;
+      
+      // Log the raw response for debugging
+      console.log("Raw response from Gemini:", responseText);
+      console.log("Response length:", responseText.length);
+      
+      try {
+        // Check if response is empty or only whitespace
+        if (!responseText || responseText.trim().length === 0) {
+          throw new Error("Empty response from Gemini API");
+        }
+        
+        // Clean the response text by removing markdown code blocks
+        let cleanedText = responseText.trim();
+        
+        // Remove markdown code blocks if present
+        if (cleanedText.startsWith('```json')) {
+          cleanedText = cleanedText.replace(/^```json\s*/, '').replace(/\s*```$/, '');
+        } else if (cleanedText.startsWith('```')) {
+          cleanedText = cleanedText.replace(/^```\s*/, '').replace(/\s*```$/, '');
+        }
+        
+        console.log("Cleaned text:", cleanedText);
+        console.log("Cleaned text length:", cleanedText.length);
+        
+        // Check if cleaned text is empty
+        if (!cleanedText || cleanedText.trim().length === 0) {
+          throw new Error("Empty response after cleaning markdown");
+        }
+        
+        // Try to parse the cleaned response as JSON
+        parsedResponse = JSON.parse(cleanedText);
+      } catch (parseError) {
+        console.error("Failed to parse response as JSON:", responseText);
+        console.error("Parse error:", parseError);
+        
+        // Fallback: create a default response
+        parsedResponse = {
+          category: 5,
+          explanation: "Unable to parse AI response. Defaulting to category 5."
+        };
+        
+        // Try to extract category from the response text if it's not empty
+        if (responseText && responseText.trim().length > 0) {
+          // Look for category numbers in the text
+          const categoryMatch = responseText.match(/category["\s]*:["\s]*(\d+)/i);
+          if (categoryMatch) {
+            const categoryNum = parseInt(categoryMatch[1]);
+            if (categoryNum >= 1 && categoryNum <= categories.length) {
+              parsedResponse.category = categoryNum;
+              parsedResponse.explanation = "Category extracted from response text.";
+            }
+          }
+        }
+      }
+
       return NextResponse.json({ 
-        response: response.text,
+        response: JSON.stringify(parsedResponse),
         address: address
       });
     } finally {
@@ -102,7 +160,7 @@ export async function GET(request: NextRequest) {
     console.error("Error calling Gemini API for address analysis:", error);
     const errorResponse = JSON.stringify({
       category: 5,
-      explanation: "I think the user best fits category 5 (mcp error)."
+      explanation: "I think the user best fits category 5 (mcp error: " + error + ")."
     });
 
     return NextResponse.json({ 

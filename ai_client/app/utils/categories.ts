@@ -22,21 +22,5 @@ export const categories = [
       id: 6,
       title: 'Institutional User',
       description: 'Address shows patterns typical of institutional investors, exchanges, or large organizations'
-    },
-    {
-      id: 7,
-      title: 'Other',
-      description: 'Address doesn\'t clearly fit into the above categories'
-    },
-    {
-      id: 8,
-      title: 'Contract',
-      description: 'Address is a contract, not an Externally Owned Account (EOA)'
-    },
-    {
-      id: 9,
-      title: 'Empty',
-      description: 'Did not observe any activity on the network for this address'
-    },
-
+    }
   ];
